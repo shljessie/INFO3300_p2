@@ -5,79 +5,99 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://d3js.org/topojson.v3.min.js"></script>
   <title>Project 2 Final</title>
+
+  <style>
+    .center {
+      text-align: center;
+      color: rgb(84, 82, 82);
+    }
+  </style>
 </head>
 
-<style>
-  .center {
-    text-align: center;
-    color: rgb(84, 82, 82);
-  }
-</style>
-  
-<h1>Project 1</h1>
-<h2>Seonghee Lee (sl994), Christy Song (cs966),Lydia Kim (lmk225), Sandy Jiang (sj458)</h2>
+<body>
+  <h1>Project 2</h1>
+  <h2>Seonghee Lee (sl994), Christy Song (cs966), Lydia Kim (lmk225), Sandy Jiang (sj458)</h2>
 
-<div class="center">
-<h3>1. General Exploration with Topography Map</h3>
-<p>i. The topography map can show different shades of a particular color for
-each country to represent their happiness ranking from the dataset. <br>
-ii. When a specific country is hovered over or selected, it can be outlined
-and we can provide information on their GDP and other information such as the MBTI distributions (e.g. distributed bar graph, horizontal bar graphs, ).</p>
+  <div class="center">
+    <h3>1. General Exploration with Topography Map</h3>
+    <p>i. The topography map can show different shades of a particular color for
+      each country to represent their happiness ranking from the dataset. <br>
+      ii. When a specific country is hovered over or selected, it can be outlined
+      and we can provide information on their GDP and other information such as the MBTI distributions (e.g. distributed
+      bar graph, horizontal bar graphs, ).</p>
 
-<h3>2. GDP of Countries sorted by MBTI</h3>
-<p>i. The bar graph would show the gdp distribution by country <br>
-ii. When the user clicks on a MBTI character, bar graphs are resorted by country with the largest distribution of that mbti to the least <br>
-iii. When the user hovers over each of the graph points (countries), a tooltip shows the distribution of the MBTI of that country. <br>
-iv. MBTI Characters</p>
-  <body>
-    <p id = "v1">
-      <strong>Visualization 1: General Exploration with Topography Map</strong><br>
-      <svg id="choropleth" height="800" width="800" style="margin:20px; border:1px solid lightgrey"></svg>
+    <strong>Visualization 1: General Exploration with Topography Map</strong><br>
+    <svg id="choropleth" height="800" width="800" style="margin:20px; border:1px solid lightgrey"></svg>
 
-      <script>
-        const svg = d3.select("#choropleth");
-        const width = svg.attr("width");
-        const height = svg.attr("height");
-        const margin = { top: 20, right: 20, bottom: 20, left:20};
-        const mapWidth = width - margin.left - margin.right;
-        const mapHeight = height - margin.top - margin.bottom;
-        const map = svg.append("g")
-          .attr("transform","translate("+margin.left+","+margin.top+")");
+    <h3>2. GDP of Countries sorted by MBTI</h3>
+    <p>i. The bar graph would show the gdp distribution by country <br>
+      ii. When the user clicks on a MBTI character, bar graphs are resorted by country with the largest distribution of
+      that mbti to the least <br>
+      iii. When the user hovers over each of the graph points (countries), a tooltip shows the distribution of the MBTI
+      of
+      that country. <br>
+      iv. MBTI Characters</p>
+    <strong>Visualization 2: GDP of Countries by each MBTI distribution</strong><br>
+    <svg id='viz2' width="800" height="500" style="margin:20px; border:1px solid lightgrey"></svg>
 
-        const requestData = async function() {
-          const data = await d3.csv("./world_happiness.csv");
-          console.log(data);
-          
-          // var zips = topojson.feature(nyincome, nyincome.objects.zip_codes);
-          // var zipsMesh = topojson.mesh(nyincome, nyincome.objects.zip_codes);
-          // var stateMesh = topojson.mesh(nyincome, nyincome.objects.state);
-          // var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], zips);
-          // var path = d3.geoPath().projection(projection);
+    <script>
+      const svg1 = d3.select("#choropleth");
+      const width1 = svg1.attr("width");
+      const height1 = svg1.attr("height");
+      const margin1 = { top: 20, right: 20, bottom: 20, left: 20 };
+      const mapWidth1 = width1 - margin1.left - margin1.right;
+      const mapHeight1 = height1 - margin1.top - margin1.bottom;
+      const map1 = svg1.append("g")
+        .attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
 
-          // const allvalues = d3.map(nyincome.objects.zip_codes.geometries, d => d.properties.median_income)
-          // const colorRange = ["054A91", "#3E7CB1", "#81A4CD","#C2FFFB", "#DBE4EE"];
-          // const colorScale = d3.scaleQuantile()
-          //   .domain(allvalues)
-          //   .range(colorRange);
+      const svg2 = d3.select("svg#viz2");
+      const width2 = svg2.attr("width");
+      const height2 = svg2.attr("height");
+      const margin2 = { top: 20, right: 20, bottom: 20, left: 20 };
+      const chartWidth2 = width2 - margin2.right;
+      const chartHeight2 = height2 - margin2.bottom;
+      const chartArea2 = svg2.append("g")
+        .attr("transform", `translate(${margin2.left}, ${margin2.top})`);
 
-          // map.selectAll("path.zip").data(zips.features)
-          //   .join("path")
-          //   .attr("class", "zip")
-          //   .attr("note", d => d.id)
-          //   .attr("d", path)
-          //   .style("fill", d => colorScale(d.properties.median_income));
+      const requestData = async function () {
+        const happiness_data = await d3.csv("./world_happiness.csv");
+        const mbti_data = await d3.csv('./mbti_countries.csv');
+        const gdp_data = await d3.csv('./gdp_countries.csv');
+        console.log(happiness_data);
+        console.log(mbti_data);
+        console.log(gdp_data);
 
-          // map.append("path").datum(zipsMesh)
-          //   .attr("class", "outline_zips")
-          //   .attr("d", path);
+        // var zips = topojson.feature(nyincome, nyincome.objects.zip_codes);
+        // var zipsMesh = topojson.mesh(nyincome, nyincome.objects.zip_codes);
+        // var stateMesh = topojson.mesh(nyincome, nyincome.objects.state);
+        // var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], zips);
+        // var path = d3.geoPath().projection(projection);
 
-          // map.append("path").datum(stateMesh)
-          //   .attr("class", "outline_state")
-          //   .attr("d", path);
-        }
-        requestData();
-      </script>
+        // const allvalues = d3.map(nyincome.objects.zip_codes.geometries, d => d.properties.median_income)
+        // const colorRange = ["054A91", "#3E7CB1", "#81A4CD","#C2FFFB", "#DBE4EE"];
+        // const colorScale = d3.scaleQuantile()
+        //   .domain(allvalues)
+        //   .range(colorRange);
+
+        // map.selectAll("path.zip").data(zips.features)
+        //   .join("path")
+        //   .attr("class", "zip")
+        //   .attr("note", d => d.id)
+        //   .attr("d", path)
+        //   .style("fill", d => colorScale(d.properties.median_income));
+
+        // map.append("path").datum(zipsMesh)
+        //   .attr("class", "outline_zips")
+        //   .attr("d", path);
+
+        // map.append("path").datum(stateMesh)
+        //   .attr("class", "outline_state")
+        //   .attr("d", path);
+      }
+      requestData();
+    </script>
     </p>
-  </body>
+</body>
 </div>
+
 </html>
