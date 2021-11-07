@@ -38,7 +38,7 @@
       that country. <br>
       iv. MBTI Characters</p>
     <strong>Visualization 2: GDP of Countries by each MBTI distribution</strong><br>
-    <svg id='viz2' width="800" height="500" style="margin:20px; border:1px solid lightgrey"></svg>
+    <svg id='viz2' width="900" height="600" style="margin:20px; border:1px solid lightgrey"></svg>
 
     <script>
       const svg1 = d3.select("#choropleth");
@@ -53,19 +53,41 @@
       const svg2 = d3.select("svg#viz2");
       const width2 = svg2.attr("width");
       const height2 = svg2.attr("height");
-      const margin2 = { top: 20, right: 20, bottom: 20, left: 20 };
+      const margin2 = { top: 5, right: 5, bottom: 20, left: 20 };
       const chartWidth2 = width2 - margin2.right;
       const chartHeight2 = height2 - margin2.bottom;
       const chartArea2 = svg2.append("g")
         .attr("transform", `translate(${margin2.left}, ${margin2.top})`);
 
       const requestData = async function () {
+        // load all data
         const happiness_data = await d3.csv("./world_happiness.csv");
         const mbti_data = await d3.csv('./mbti_countries.csv');
         const gdp_data = await d3.csv('./gdp_countries.csv');
         console.log(happiness_data);
         console.log(mbti_data);
         console.log(gdp_data);
+
+        // mbti_data: convert distribution to numbers & add -A and -T of same type
+        mbti_data.forEach((d, i) => {
+          mbti_keys = ['ENFJ', 'ENFP', 'ENTJ', 'ENTP', 'ESFJ', 'ESFP', 'ESTJ', 'ESTP', 'INFJ', 'INFP', 'INTJ', 'INTP', 'ISFJ', 'ISFP', 'ISTJ', 'ISTP'];
+          mbti_keys.forEach((mbti, mbti_i) => {
+            d[mbti + '-A'] = Number(d[mbti + '-A']);
+            d[mbti + '-T'] = Number(d[mbti + '-T']);
+            d[mbti] = d[mbti + '-A'] + d[mbti + '-T'];
+          });
+        });
+        console.log(mbti_data);
+
+        // gdp_data: convert gdp to number
+        gdp_data.forEach((d, i) => {
+          d['GDP ($ per capita)'] = Number(d['GDP ($ per capita)']);
+        });
+        console.log(gdp_data);
+
+        // viz2
+        const mbtiCountriesNum = Object.keys(mbti_data).length;
+        console.log(mbtiCountriesNum);
 
         // var zips = topojson.feature(nyincome, nyincome.objects.zip_codes);
         // var zipsMesh = topojson.mesh(nyincome, nyincome.objects.zip_codes);
