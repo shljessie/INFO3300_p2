@@ -11,6 +11,16 @@
       text-align: center;
       color: rgb(84, 82, 82);
     }
+    .gridlines line {
+      stroke: #bbb;
+      stroke-width: 1px;
+    }
+
+    .gridlines .domain {
+      stroke: none;
+    }
+
+
   </style>
 </head>
 
@@ -30,7 +40,7 @@
     <svg id="choropleth" height="800" width="800" style="margin:20px; border:1px solid lightgrey"></svg>
 
     <h3>2. GDP of Countries sorted by MBTI</h3>
-    <p>i. The bar graph would show the gdp distribution by country <br>
+    <p style="text-align: start;">i. The bar graph would show the gdp distribution by country <br>
       ii. When the user clicks on a MBTI character, bar graphs are resorted by country with the largest distribution of
       that mbti to the least <br>
       iii. When the user hovers over each of the graph points (countries), a tooltip shows the distribution of the MBTI
@@ -38,7 +48,8 @@
       that country. <br>
       iv. MBTI Characters</p>
     <strong>Visualization 2: GDP of Countries by each MBTI distribution</strong><br>
-    <svg id='viz2' width="900" height="600" style="margin:20px; border:1px solid lightgrey"></svg>
+    <svg id='viz2' width="900" height="600" style="margin:20px;"></svg>
+    <div id="button-bar" style="margin-left: 100px;" ></div>
 
     <script>
       const svg1 = d3.select("#choropleth");
@@ -53,68 +64,181 @@
       const svg2 = d3.select("svg#viz2");
       const width2 = svg2.attr("width");
       const height2 = svg2.attr("height");
-      const margin2 = { top: 5, right: 5, bottom: 20, left: 20 };
-      const chartWidth2 = width2 - margin2.right;
+      const margin2 = { top: 5, right: 5, bottom: 20, left: 35 };
+      const chartWidth2 = width2 - margin2.left;
       const chartHeight2 = height2 - margin2.bottom;
-      const chartArea2 = svg2.append("g")
+      let chartArea2 = svg2.append("g").attr('id','chartarea2')
         .attr("transform", `translate(${margin2.left}, ${margin2.top})`);
-
+      // let annotations = svg2.append("g").attr("id","countries");
+      // const selectSpecies = d3.select("#selectSpecies");
+        
       const requestData = async function () {
         // load all data
         const happiness_data = await d3.csv("./world_happiness.csv");
-        const mbti_data = await d3.csv('./mbti_countries.csv');
+        let mbti_data = await d3.csv('./mbti_countries.csv');
         const gdp_data = await d3.csv('./gdp_countries.csv');
-        console.log(happiness_data);
         console.log(mbti_data);
-        console.log(gdp_data);
+        const mbti_keys = ['ENFJ', 'ENFP', 'ENTJ', 'ENTP', 'ESFJ', 'ESFP', 'ESTJ', 'ESTP', 'INFJ', 'INFP', 'INTJ', 'INTP', 'ISFJ', 'ISFP', 'ISTJ', 'ISTP'];
 
         // mbti_data: convert distribution to numbers & add -A and -T of same type
         mbti_data.forEach((d, i) => {
-          mbti_keys = ['ENFJ', 'ENFP', 'ENTJ', 'ENTP', 'ESFJ', 'ESFP', 'ESTJ', 'ESTP', 'INFJ', 'INFP', 'INTJ', 'INTP', 'ISFJ', 'ISFP', 'ISTJ', 'ISTP'];
           mbti_keys.forEach((mbti, mbti_i) => {
             d[mbti + '-A'] = Number(d[mbti + '-A']);
             d[mbti + '-T'] = Number(d[mbti + '-T']);
             d[mbti] = d[mbti + '-A'] + d[mbti + '-T'];
           });
         });
+        // console.log(mbti_data);
+        let del_countries = ['Antigua and Barbuda', 'Bahamas', 'Bosnia and Herzegovina', 'Congo', 'Congo (Kinshasa)', 'Montenegro', 'Myanmar', 'South Korea', 'Saint Kitts and Nevis', 'Trinidad and Tobago']
+        
+        mbti_data = mbti_data.filter((d) => {
+          // console.log(d['Country'] in ['Antigua and Barbuda', 'Bahamas']);
+          return !(del_countries.includes(d['Country']));
+        });
         console.log(mbti_data);
-
+        
+        
         // gdp_data: convert gdp to number
         gdp_data.forEach((d, i) => {
+          d['Country'] = d['Country'].trim();
           d['GDP ($ per capita)'] = Number(d['GDP ($ per capita)']);
         });
-        console.log(gdp_data);
+        // console.log(gdp_data);
+        let regions = gdp_data.map(d => d['Region']);
+        // console.log(new Set(regions));
 
-        // viz2
-        const mbtiCountriesNum = Object.keys(mbti_data).length;
-        console.log(mbtiCountriesNum);
+        let gdpGroup = Object.fromEntries(d3.group(gdp_data, d => d.Country));
+        // console.log(gdpGroup);
+        
+        let mbtiGroup = Object.fromEntries(d3.group(mbti_data, d => d.Country));
+        // console.log(mbtiGroup);
+        // console.log( gdpGroup['Afghanistan'][0]['GDP ($ per capita)']);
 
-        // var zips = topojson.feature(nyincome, nyincome.objects.zip_codes);
-        // var zipsMesh = topojson.mesh(nyincome, nyincome.objects.zip_codes);
-        // var stateMesh = topojson.mesh(nyincome, nyincome.objects.state);
-        // var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], zips);
-        // var path = d3.geoPath().projection(projection);
 
-        // const allvalues = d3.map(nyincome.objects.zip_codes.geometries, d => d.properties.median_income)
-        // const colorRange = ["054A91", "#3E7CB1", "#81A4CD","#C2FFFB", "#DBE4EE"];
-        // const colorScale = d3.scaleQuantile()
-        //   .domain(allvalues)
-        //   .range(colorRange);
+        // list of mbti countries only
+        let mbti_countries = mbti_data.map(d => d['Country']);
+        // console.log(mbti_countries);
 
-        // map.selectAll("path.zip").data(zips.features)
-        //   .join("path")
-        //   .attr("class", "zip")
-        //   .attr("note", d => d.id)
-        //   .attr("d", path)
-        //   .style("fill", d => colorScale(d.properties.median_income));
 
-        // map.append("path").datum(zipsMesh)
-        //   .attr("class", "outline_zips")
-        //   .attr("d", path);
+        // group countries by mbti
+        let mbtiByCountryData = {};
+        mbti_keys.forEach((m, i) => {
+          mbti_countries.forEach((c, i) => {
+            if (!(m in mbtiByCountryData)) {
+              mbtiByCountryData[m] = [];
+            };
+            let countryKey= {};
+            countryKey[c] = mbtiGroup[c][0][m];
+            mbtiByCountryData[m].push(countryKey);
+          });
+        });
+        console.log(mbtiByCountryData);
 
-        // map.append("path").datum(stateMesh)
-        //   .attr("class", "outline_state")
-        //   .attr("d", path);
+        mbti_countries.forEach((c, i) => {
+          if (c in gdpGroup) {
+            mbtiGroup[c][0].GDP = gdpGroup[c][0]['GDP ($ per capita)'];
+          } 
+        });
+
+        console.log(mbtiGroup);
+
+        // y axis
+        let gdpExtent = d3.extent(Object.entries(mbtiGroup), ([k, v]) => mbtiGroup[k][0]['GDP']);
+        console.log(gdpExtent);
+        let gdpScale = d3.scaleLinear()
+                          .range([chartHeight2, 0])
+                          .domain([0,gdpExtent[1]]);
+
+        let leftAxis = d3.axisLeft(gdpScale).tickFormat(d3.format('$.2s'));
+
+        let leftGridlines = d3.axisLeft(gdpScale)
+                              .tickFormat('')
+                              .tickSize(-chartWidth2);
+                        
+        svg2.append('g').attr('class', 'y axis')
+            .attr("transform",`translate(${margin2.left},${margin2.top})`)
+            .call(leftAxis);
+
+        svg2.append('g').attr('class', 'y gridlines')
+            .attr("transform",`translate(${margin2.left},${margin2.top})`)
+            .call(leftGridlines);
+                          
+        // x axis 
+        let mbtiCountry = Object.keys(mbtiGroup);
+        const countryScale = d3.scaleBand().domain(mbtiCountry).range([margin2.left, chartWidth2]).padding([0]);
+
+        let bottomAxis = d3.axisBottom();
+        const bottomAxisG= svg2.append("g")
+                                .attr('transform',`translate(${margin2.left-10},${chartHeight2-40})`);
+
+        // get final data mbtis
+        const allKeys = Object.keys(mbtiByCountryData).sort();
+        // var selectText = document.getElementById("selectSpecies");
+
+
+          // create buttons for each of the MBTI keys
+          allKeys.forEach (d => {
+            d3.select("div#button-bar")
+              .append("button")
+              .style("background-color", "white")
+              .style("margin", 10)
+              .style("padding", 5)
+              .style("width", 250)
+              .text(d)
+              .on("click",function(){
+                updateBarsAnimated(d);
+                d3.select(this).style("background-color", "#ccc");
+                // selectText.innerText = d;
+                // // selectSpecies.append('text')
+                // //              .text(d);
+              })
+              .on("mouseout",function(){
+                d3.select(this).style("background-color", "white");
+              })
+          })
+
+        const colorScale = d3.scaleOrdinal(d3.schemeSet2);
+
+        console.log(mbtiGroup);
+
+        function updateBarsAnimated(mbtiKey) {
+          console.log(mbtiKey);
+          const data = mbtiByCountryData[mbtiKey];
+          console.log(data);
+
+          data.sort( (a,b) => d3.ascending(Object.entries(a)[0][1],Object.entries(b)[0][1]) )
+
+          // bottomAxisG.transition().call(bottomAxis);
+
+          chartArea2.selectAll('rect.bar').data(data)
+             .join(
+
+               enter => enter.append('rect')
+                              .attr('class','bar')
+                              .attr('fill', 'steelblue')
+                              .attr("x", (d,i) => (chartWidth2/mbtiCountry.length)*i)
+                              .attr("y", d => gdpScale(mbtiGroup[Object.entries(d)[0][0]] [0].GDP) )
+                              .attr("height", d => gdpScale(0) - gdpScale(mbtiGroup[Object.entries(d)[0][0]] [0].GDP))
+                              .attr("width", countryScale.bandwidth())
+                              .attr("mbti",d=> Object.entries(d)[0][1])
+                              .attr("country",d=> Object.entries(d)[0][0])
+                              .attr("gdp",d=> mbtiGroup[Object.entries(d)[0][0]] [0].GDP)
+                              .attr("opacity",0)
+                              .call(enter => enter.transition().attr("opacity",1)),
+
+              update => update.call(update => update.transition()
+                                                    .attr("x",(d,i)=> (chartWidth2/mbtiCountry.length)*i)
+                                                    .attr("y",d=> gdpScale(mbtiGroup[Object.entries(d)[0][0]] [0].GDP))
+                                                    .attr("height", d => gdpScale(0) - gdpScale(mbtiGroup[Object.entries(d)[0][0]] [0].GDP))
+                                                    .attr("width", countryScale.bandwidth())),
+
+              exit => exit.call( exit => exit.transition().attr("opacity",0).remove())
+             );
+        }
+        chartArea2.raise();
+
+        updateBarsAnimated('ENTJ');
+
       }
       requestData();
     </script>
