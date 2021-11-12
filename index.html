@@ -74,9 +74,9 @@
         
       const requestData = async function () {
         // load all data
-        const happiness_data = await d3.csv("./world_happiness.csv");
-        let mbti_data = await d3.csv('./mbti_countries.csv');
-        const gdp_data = await d3.csv('./gdp_countries.csv');
+        const happiness_data = await d3.csv("./data/world_happiness.csv");
+        let mbti_data = await d3.csv('./data/mbti_countries.csv');
+        const gdp_data = await d3.csv('./data/gdp_countries.csv');
         console.log(mbti_data);
         const mbti_keys = ['ENFJ', 'ENFP', 'ENTJ', 'ENTP', 'ESFJ', 'ESFP', 'ESTJ', 'ESTP', 'INFJ', 'INFP', 'INTJ', 'INTP', 'ISFJ', 'ISFP', 'ISTJ', 'ISTP'];
 
