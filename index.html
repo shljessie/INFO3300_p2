@@ -102,13 +102,23 @@
         gdp_data.forEach((d, i) => {
           d['Country'] = d['Country'].trim();
           d['GDP ($ per capita)'] = Number(d['GDP ($ per capita)']);
+          let reg = d['Region'];
+          if (['ASIA (EX. NEAR EAST)','NEAR EAST', 'C.W. OF IND. STATES']. includes(d['Region'].trim())) {
+            reg = 'ASIA';
+          } else if (["EASTERN EUROPE","WESTERN EUROPE", 'BALTICS']. includes(d['Region'].trim())) {
+            reg = 'EUROPE';
+          } else if (["SUB-SAHARAN AFRICA","NORTHERN AFRICA"]. includes(d['Region'].trim())) {
+            reg = 'AFRICA';
+          }
+          d['Region'] = reg;
+
         });
         // console.log(gdp_data);
         let regions = gdp_data.map(d => d['Region']);
-        // console.log(new Set(regions));
+        console.log(new Set(regions));
 
         let gdpGroup = Object.fromEntries(d3.group(gdp_data, d => d.Country));
-        // console.log(gdpGroup);
+        console.log(gdpGroup);
         
         let mbtiGroup = Object.fromEntries(d3.group(mbti_data, d => d.Country));
         // console.log(mbtiGroup);
@@ -180,11 +190,15 @@
           allKeys.forEach (d => {
             d3.select("div#button-bar")
               .append("button")
+              .text(d)
+              .append("image")
+              .attr('xlink:src',"../images/"+ d+".png")
               .style("background-color", "white")
+              // .style("background-image","./images/"+ d.png)
               .style("margin", 10)
               .style("padding", 5)
               .style("width", 250)
-              .text(d)
+
               .on("click",function(){
                 updateBarsAnimated(d);
                 d3.select(this).style("background-color", "#ccc");
@@ -197,6 +211,9 @@
               })
           })
 
+
+
+        // const colorScale = d3.scaleOrdinal([`#46874f`, `#DB675B`, `#665adb`, `#b375bf`, `#b63e36`, `#b74a70`, `#946943`]);
         const colorScale = d3.scaleOrdinal(d3.schemeSet2);
 
         console.log(mbtiGroup);
@@ -215,22 +232,27 @@
 
                enter => enter.append('rect')
                               .attr('class','bar')
-                              .attr('fill', 'steelblue')
+                              .attr('fill', d => (colorScale(gdpGroup[Object.entries(d)[0][0]] [0].Region)))
                               .attr("x", (d,i) => (chartWidth2/mbtiCountry.length)*i)
                               .attr("y", d => gdpScale(mbtiGroup[Object.entries(d)[0][0]] [0].GDP) )
                               .attr("height", d => gdpScale(0) - gdpScale(mbtiGroup[Object.entries(d)[0][0]] [0].GDP))
                               .attr("width", countryScale.bandwidth())
                               .attr("mbti",d=> Object.entries(d)[0][1])
                               .attr("country",d=> Object.entries(d)[0][0])
+                              .attr('region', d => (gdpGroup[Object.entries(d)[0][0]] [0].Region))
                               .attr("gdp",d=> mbtiGroup[Object.entries(d)[0][0]] [0].GDP)
                               .attr("opacity",0)
                               .call(enter => enter.transition().attr("opacity",1)),
 
               update => update.call(update => update.transition()
-                                                    .attr("x",(d,i)=> (chartWidth2/mbtiCountry.length)*i)
-                                                    .attr("y",d=> gdpScale(mbtiGroup[Object.entries(d)[0][0]] [0].GDP))
-                                                    .attr("height", d => gdpScale(0) - gdpScale(mbtiGroup[Object.entries(d)[0][0]] [0].GDP))
-                                                    .attr("width", countryScale.bandwidth())),
+                              .attr("x",(d,i)=> (chartWidth2/mbtiCountry.length)*i)
+                              .attr('fill', d => (colorScale(gdpGroup[Object.entries(d)[0][0]] [0].Region)))
+                              .attr("y",d=> gdpScale(mbtiGroup[Object.entries(d)[0][0]] [0].GDP))
+                              .attr("mbti",d=> Object.entries(d)[0][1])
+                              .attr("country",d=> Object.entries(d)[0][0])
+                              .attr('region', d => (gdpGroup[Object.entries(d)[0][0]] [0].Region))
+                              .attr("gdp",d=> mbtiGroup[Object.entries(d)[0][0]] [0].GDP)                                                    .attr("height", d => gdpScale(0) - gdpScale(mbtiGroup[Object.entries(d)[0][0]] [0].GDP))
+                              .attr("width", countryScale.bandwidth())),
 
               exit => exit.call( exit => exit.transition().attr("opacity",0).remove())
              );
@@ -238,6 +260,26 @@
         chartArea2.raise();
 
         updateBarsAnimated('ENTJ');
+
+
+         // x axis
+         svg2.append("text")
+            .attr("class", "x label")
+            .attr("text-anchor", "end")
+            .style("font-size",15)
+            .attr("x", (width2/2)+130)
+            .attr("y", height2)
+            .text("Selected MBTI Distribution Ranking");
+        
+        //  y axis
+        svg2.append("text")
+           .attr("class", "y label")
+           .attr("text-anchor", "end")
+           .attr("x", -height2/2)
+           .attr("y", -10)
+           .attr("dy", ".75em")
+           .attr("transform", "rotate(-90)")
+           .text("GDP");
 
       }
       requestData();
