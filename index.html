@@ -102,7 +102,7 @@
           });
         });
         // console.log(mbti_data);
-        let del_countries = ['Antigua and Barbuda', 'Bahamas', 'Bosnia and Herzegovina', 'Congo', 'Congo (Kinshasa)', 'Montenegro', 'Myanmar', 'South Korea', 'Saint Kitts and Nevis', 'Trinidad and Tobago']
+        let del_countries = ['Montenegro', 'Myanmar']
 
         mbti_data = mbti_data.filter((d) => {
           // console.log(d['Country'] in ['Antigua and Barbuda', 'Bahamas']);
@@ -114,6 +114,24 @@
         // gdp_data: convert gdp to number
         gdp_data.forEach((d, i) => {
           d['Country'] = d['Country'].trim();
+          if (d['Country'] == 'Korea, South') {
+            d['Country'] = 'South Korea'
+          } else if (d['Country'] == 'Antigua & Barbuda') {
+            d['Country'] = 'Antigua and Barbuda'
+          } else if (d['Country'] == 'Bosnia & Herzegovina') {
+            d['Country'] = 'Bosnia and Herzegovina'
+          } else if (d['Country'] == 'Bahamas, The') {
+            d['Country'] = 'Bahamas'
+          } else if (d['Country'] == 'Congo, Dem. Rep.') {
+            d['Country'] = 'Congo (Kinshasa)'
+          } else if (d['Country'] == 'Congo, Repub. of the') {
+            d['Country'] = 'Congo'
+          } else if (d['Country'] == 'Trinidad & Tobago') {
+            d['Country'] = 'Trinidad and Tobago'
+          } else if (d['Country'] == 'Saint Kitts & Nevis') {
+            d['Country'] = 'Saint Kitts and Nevis'
+          }
+
           d['GDP ($ per capita)'] = Number(d['GDP ($ per capita)']);
           let reg = d['Region'];
           if (['ASIA (EX. NEAR EAST)', 'NEAR EAST', 'C.W. OF IND. STATES'].includes(d['Region'].trim())) {
@@ -126,7 +144,7 @@
           d['Region'] = reg;
 
         });
-        // console.log(gdp_data);
+        console.log(gdp_data);
         let regions = gdp_data.map(d => d['Region']);
         console.log(new Set(regions));
 
