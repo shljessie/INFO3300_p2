@@ -92,7 +92,6 @@
         const happiness_data = await d3.csv("./data/world_happiness.csv");
         let mbti_data = await d3.csv('./data/mbti_countries.csv');
         const gdp_data = await d3.csv('./data/gdp_countries.csv');
-        console.log(mbti_data);
         const mbti_keys = ['ENFJ', 'ENFP', 'ENTJ', 'ENTP', 'ESFJ', 'ESFP', 'ESTJ', 'ESTP', 'INFJ', 'INFP', 'INTJ', 'INTP', 'ISFJ', 'ISFP', 'ISTJ', 'ISTP'];
 
         // mbti_data: convert distribution to numbers & add -A and -T of same type
@@ -103,15 +102,11 @@
             d[mbti] = d[mbti + '-A'] + d[mbti + '-T'];
           });
         });
-        // console.log(mbti_data);
         let del_countries = ['Montenegro', 'Myanmar']
 
         mbti_data = mbti_data.filter((d) => {
-          // console.log(d['Country'] in ['Antigua and Barbuda', 'Bahamas']);
           return !(del_countries.includes(d['Country']));
         });
-        console.log(mbti_data);
-
 
         // gdp_data: convert gdp to number
         gdp_data.forEach((d, i) => {
@@ -146,12 +141,9 @@
           d['Region'] = reg;
 
         });
-        console.log(gdp_data);
         let regions = gdp_data.map(d => d['Region']);
-        console.log(new Set(regions));
 
         let gdpGroup = Object.fromEntries(d3.group(gdp_data, d => d.Country));
-        console.log(gdpGroup);
 
         let mbtiGroup = Object.fromEntries(d3.group(mbti_data, d => d.Country));
 
@@ -170,7 +162,6 @@
             mbtiByCountryData[m].push(countryKey);
           });
         });
-        console.log(mbtiByCountryData);
 
         mbti_countries.forEach((c, i) => {
           if (c in gdpGroup) {
@@ -178,11 +169,39 @@
           }
         });
 
-        console.log(mbtiGroup);
+        console.log(happiness_data);
+        // First Visualization
+        happiness_data.forEach( (d, i) => {
+          d['country'] = (d['Country name']);
+          d['happiness'] = Number(d['Healthy life expectancy']);
+        });
 
+        var projection1 = d3.geoMercator()
+          .translate([width1/2, height1/2])
+          .scale(100)
+
+        var path = d3.geoPath().projection(projection1);
+
+        const happy_countries = topojson.feature(happiness_data, happiness_data.country);
+        console.log(happy_countries);
+
+        // map1.selectAll(".country")
+        //   .data(happiness_data.country)
+        //   .join("path")
+        //   .attr("class", "country")
+        //   .attr("note", d => d.id)
+        //   .attr("d", path)
+
+          let map = d3.select("#map");
+          let mapWidth = map.attr("width");
+          let mapHeight = map.attr("height");
+          let projection = d3.geoAlbers().fitSize([mapWidth, mapHeight], states);
+          let path2 = d3.geoPath().projection(projection);
+          let viewport = map.append("g");
+
+        // Second Visualization
         // y axis
         let gdpExtent = d3.extent(Object.entries(mbtiGroup), ([k, v]) => mbtiGroup[k][0]['GDP']);
-        console.log(gdpExtent);
         let gdpScale = d3.scaleLinear()
           .range([chartHeight2, 0])
           .domain([0, gdpExtent[1]]);
@@ -249,12 +268,8 @@
         // const colorScale = d3.scaleOrdinal([`#46874f`, `#DB675B`, `#665adb`, `#b375bf`, `#b63e36`, `#b74a70`, `#946943`]);
         const colorScale = d3.scaleOrdinal(d3.schemeSet2);
 
-        console.log(mbtiGroup);
-
         function updateBarsAnimated(mbtiKey) {
-          console.log(mbtiKey);
           const data = mbtiByCountryData[mbtiKey];
-          console.log(data);
 
           data.sort((a, b) => d3.ascending(Object.entries(a)[0][1], Object.entries(b)[0][1]))
 
@@ -336,13 +351,11 @@
         const textbox = mouseover.append('g').attr('transform', "translate(5,5)").style('font-size', '10pt');
 
         let bars = chartArea2.selectAll('rect.bar');
-        console.log(bars);
 
         function updateMouseover(dat) {
           textbox.html('');
 
           let d = mbtiGroup[Object.entries(dat)[0][0]][0];
-          console.log(d);
           let country = `Country: ${d['Country']}`;
           let gdp = `GDP per capita ($): $${d['GDP'].toString()}`;
           let mbti = `${current_mbti} percentage: ${(d[current_mbti] * 100).toFixed(2)}%`;
@@ -360,7 +373,7 @@
         };
 
         bars.on('mouseover', function (d) {
-          console.log(Object.entries(d3.select(this).datum())[0]);
+          // console.log(Object.entries(d3.select(this).datum())[0]);
           d3.select(this)
             .transition().duration(100)
             .attr('stroke-width', 1)
