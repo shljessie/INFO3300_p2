@@ -53,6 +53,7 @@
     <svg id="choropleth" height="800" width="800" style="margin:20px; border:1px solid lightgrey"></svg>
 
     <h3>2. GDP of Countries sorted by MBTI</h3>
+    <div id="legend"></div>
     <p style="text-align: start;">i. The bar graph would show the gdp distribution by country <br>
       ii. When the user clicks on a MBTI character, bar graphs are resorted by country with the largest distribution of
       that mbti to the least <br>
@@ -61,8 +62,11 @@
       that country. <br>
       iv. MBTI Characters</p>
     <strong>Visualization 2: GDP of Countries by each MBTI distribution</strong><br>
-    <svg id='viz2' width="900" height="600" style="margin:20px;"></svg>
-    <div id="button-bar" style="margin-left: 100px;"></div>
+    <div id="mbtiSelect" style="font-size: 30px;"></div>
+    <div style="display: flex;">
+      <svg id='viz2' width="800" height="600" style="margin:20px;margin-left: 50px;"></svg>
+      <div id="button-bar" style="width: 500px; margin-left: 30px;"> </div>
+    </div>
 
     <script>
       const svg1 = d3.select("#choropleth");
@@ -82,8 +86,6 @@
       const chartHeight2 = height2 - margin2.bottom;
       let chartArea2 = svg2.append("g").attr('id', 'chartarea2')
         .attr("transform", `translate(${margin2.left}, ${margin2.top})`);
-      // let annotations = svg2.append("g").attr("id","countries");
-      // const selectSpecies = d3.select("#selectSpecies");
 
       const requestData = async function () {
         // load all data
@@ -126,7 +128,6 @@
           d['Region'] = reg;
 
         });
-        // console.log(gdp_data);
         let regions = gdp_data.map(d => d['Region']);
         console.log(new Set(regions));
 
@@ -134,14 +135,9 @@
         console.log(gdpGroup);
 
         let mbtiGroup = Object.fromEntries(d3.group(mbti_data, d => d.Country));
-        // console.log(mbtiGroup);
-        // console.log( gdpGroup['Afghanistan'][0]['GDP ($ per capita)']);
-
 
         // list of mbti countries only
         let mbti_countries = mbti_data.map(d => d['Country']);
-        // console.log(mbti_countries);
-
 
         // group countries by mbti
         let mbtiByCountryData = {};
@@ -199,29 +195,33 @@
         // var selectText = document.getElementById("selectSpecies");
 
         let current_mbti = 'ENTJ'
+        var selectText = document.getElementById("mbtiSelect");
+
         // create buttons for each of the MBTI keys
         allKeys.forEach(d => {
-          d3.select("div#button-bar")
-            .append("button")
-            .text(d)
-            // .append("image")
-            // .attr('xlink:src',"../images/"+ d+".png")
-            .style("background-color", "white")
-            // .style("background-image","./images/"+ d.png)
-            .style("margin", 10)
-            .style("padding", 5)
-            .style("width", 250)
+          var img = document.createElement('img'); 
+          img.src = "../images/"+d+".png";
+          let mbtiImage = document.getElementById('button-bar').appendChild(img);
+          mbtiImage.id = d;
+          mbtiImage.style.height = '150px';
+          mbtiImage.style.width = '120px';
 
+          d3.select("#"+d)
+            .on("mouseover", function (){
+              mbtiImage.style.cursor = "pointer";
+              mbtiImage.style.width = "140";
+              mbtiImage.style.height = "160";
+            })
             .on("click", function () {
               current_mbti = d;
               updateBarsAnimated(d);
               d3.select(this).style("background-color", "#ccc");
-              // selectText.innerText = d;
-              // // selectSpecies.append('text')
-              // //              .text(d);
+              selectText.innerText = d;
             })
             .on("mouseout", function () {
               d3.select(this).style("background-color", "white");
+              mbtiImage.style.width = "120";
+              mbtiImage.style.height = "150";
             })
         })
 
@@ -345,7 +345,8 @@
           d3.select(this)
             .transition().duration(100)
             .attr('stroke-width', 1)
-            .attr('stroke', 'steelBlue');
+            .attr('stroke', 'steelBlue')
+            .style('cursor','pointer');
 
           mouseover.attr('visibility', '');
           updateMouseover(d3.select(this).datum());
