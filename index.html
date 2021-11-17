@@ -36,8 +36,8 @@
     }
 
     .outline_countries {
-      stroke: darkgrey;
-      stroke-width: 3px;
+      stroke: black;
+      stroke-width: 1px;
       fill: none;
     }
   </style>
@@ -56,7 +56,7 @@
       bar graph, horizontal bar graphs, ).</p>
 
     <strong>Visualization 1: General Exploration with Topography Map</strong><br>
-    <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid lightgrey"></svg>
+    <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid lightgrey" fill = "gray"></svg>
 
     <h3>2. GDP of Countries sorted by MBTI</h3>
     <div id="legend"></div>
@@ -97,7 +97,9 @@
         // load all data
         const happiness_data = await d3.csv("./data/world_happiness.csv");
         let mbti_data = await d3.csv('./data/mbti_countries.csv');
+        console.log(mbti_data);
         const gdp_data = await d3.csv('./data/gdp_countries.csv');
+        console.log(gdp_data);
         const world = await d3.json("./data/countries-110m.json");
         console.log(world);
         const mbti_keys = ['ENFJ', 'ENFP', 'ENTJ', 'ENTP', 'ESFJ', 'ESFP', 'ESTJ', 'ESTP', 'INFJ', 'INFP', 'INTJ', 'INTP', 'ISFJ', 'ISFP', 'ISTJ', 'ISTP'];
@@ -154,6 +156,7 @@
         let gdpGroup = Object.fromEntries(d3.group(gdp_data, d => d.Country));
 
         let mbtiGroup = Object.fromEntries(d3.group(mbti_data, d => d.Country));
+        console.log(mbtiGroup);
 
         // list of mbti countries only
         let mbti_countries = mbti_data.map(d => d['Country']);
@@ -185,29 +188,52 @@
           .fitSize([mapWidth1, mapHeight1], countries);
         var path = d3.geoPath().projection(projection1);
 
+        happiness_data.forEach( (d, i) => {
+          d['country'] = (d['Country name'].trim());
+          if (d['country'] == 'United States') {
+            d['country'] = 'United States of America'
+          };
+          d['happiness'] = Number(d['Healthy life expectancy']);
+        });
+
+        let happinessGroup = Object.fromEntries(d3.group(happiness_data, d => d.country));
+        console.log(happinessGroup);
+
+        let happiness_countries = happiness_data.map(d => d['country']);
+
+        happiness_countries.forEach((c, i) => {
+          happiness_countries[c] = Number(happinessGroup[c][0]['Healthy life expectancy']);
+        })
+        console.log(happiness_countries);
+
+        let happinessExtent = d3.extent(Object.entries(happinessGroup), ([k, v]) => happinessGroup[k][0]['Healthy life expectancy']);
+        console.log(happinessExtent);
+
+        const colorScale1 = d3.scaleSequential(d3.interpolate("red", "yellow"))
+          .domain(happinessExtent);
+
         map1.selectAll(".countries").data(countries.features)
           .join("path")
           .attr("class", "countries")
-          .attr("d", path);
+          .attr("d", path)
+          .style("fill", d => colorScale1(happiness_countries[d.properties.name]))
+          // .on('mouseover', mouseEntersPlot )
+          // .on('mouseout', mouseLeavesPlot );
+        
 
         map1.append("path").datum(countriesMesh)
           .attr("class", "outline_countries")
           .attr("d", path);
 
-        // happiness_data.forEach( (d, i) => {
-        //   d['country'] = (d['Country name']);
-        //   d['happiness'] = Number(d['Healthy life expectancy']);
-        // });
+        
+        
+        
+        // let momesh =  map.append("path")
+        //             .attr("class","mouseover outline")
+        //             .attr("d", "");
 
-        // const happy_countries = topojson.feature(happiness_data, happiness_data.country);
-        // console.log(happy_countries);
-
-          // let map = d3.select("#map");
-          // let mapWidth = map.attr("width");
-          // let mapHeight = map.attr("height");
-          // let projection = d3.geoAlbers().fitSize([mapWidth, mapHeight], states);
-          // let path2 = d3.geoPath().projection(projection);
-          // let viewport = map.append("g");
+        // d3.selectAll(".countries").on("mouseenter", mouseEntersPlot);
+        // d3.selectAll(".countries").on("mouseout",  mouseLeavesPlot);
 
         // Second Visualization
         // y axis
