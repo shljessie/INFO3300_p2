@@ -34,6 +34,12 @@
     g.mouseover text:first-child {
       font-weight: bold;
     }
+
+    .outline_countries {
+      stroke: darkgrey;
+      stroke-width: 3px;
+      fill: none;
+    }
   </style>
 </head>
 
@@ -50,7 +56,7 @@
       bar graph, horizontal bar graphs, ).</p>
 
     <strong>Visualization 1: General Exploration with Topography Map</strong><br>
-    <svg id="choropleth" height="800" width="800" style="margin:20px; border:1px solid lightgrey"></svg>
+    <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid lightgrey"></svg>
 
     <h3>2. GDP of Countries sorted by MBTI</h3>
     <div id="legend"></div>
@@ -92,6 +98,8 @@
         const happiness_data = await d3.csv("./data/world_happiness.csv");
         let mbti_data = await d3.csv('./data/mbti_countries.csv');
         const gdp_data = await d3.csv('./data/gdp_countries.csv');
+        const world = await d3.json("./data/countries-110m.json");
+        console.log(world);
         const mbti_keys = ['ENFJ', 'ENFP', 'ENTJ', 'ENTP', 'ESFJ', 'ESFP', 'ESTJ', 'ESTP', 'INFJ', 'INFP', 'INTJ', 'INTP', 'ISFJ', 'ISFP', 'ISTJ', 'ISTP'];
 
         // mbti_data: convert distribution to numbers & add -A and -T of same type
@@ -171,33 +179,35 @@
 
         console.log(happiness_data);
         // First Visualization
-        happiness_data.forEach( (d, i) => {
-          d['country'] = (d['Country name']);
-          d['happiness'] = Number(d['Healthy life expectancy']);
-        });
-
-        var projection1 = d3.geoMercator()
-          .translate([width1/2, height1/2])
-          .scale(100)
-
+        var countries = topojson.feature(world, world.objects.countries);
+        var countriesMesh = topojson.mesh(world, world.objects.countries);
+        var projection1 = d3.geoEquirectangular()
+          .fitSize([mapWidth1, mapHeight1], countries);
         var path = d3.geoPath().projection(projection1);
 
-        const happy_countries = topojson.feature(happiness_data, happiness_data.country);
-        console.log(happy_countries);
+        map1.selectAll(".countries").data(countries.features)
+          .join("path")
+          .attr("class", "countries")
+          .attr("d", path);
 
-        // map1.selectAll(".country")
-        //   .data(happiness_data.country)
-        //   .join("path")
-        //   .attr("class", "country")
-        //   .attr("note", d => d.id)
-        //   .attr("d", path)
+        map1.append("path").datum(countriesMesh)
+          .attr("class", "outline_countries")
+          .attr("d", path);
 
-          let map = d3.select("#map");
-          let mapWidth = map.attr("width");
-          let mapHeight = map.attr("height");
-          let projection = d3.geoAlbers().fitSize([mapWidth, mapHeight], states);
-          let path2 = d3.geoPath().projection(projection);
-          let viewport = map.append("g");
+        // happiness_data.forEach( (d, i) => {
+        //   d['country'] = (d['Country name']);
+        //   d['happiness'] = Number(d['Healthy life expectancy']);
+        // });
+
+        // const happy_countries = topojson.feature(happiness_data, happiness_data.country);
+        // console.log(happy_countries);
+
+          // let map = d3.select("#map");
+          // let mapWidth = map.attr("width");
+          // let mapHeight = map.attr("height");
+          // let projection = d3.geoAlbers().fitSize([mapWidth, mapHeight], states);
+          // let path2 = d3.geoPath().projection(projection);
+          // let viewport = map.append("g");
 
         // Second Visualization
         // y axis
