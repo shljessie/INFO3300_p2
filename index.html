@@ -40,6 +40,21 @@
       stroke-width: 1px;
       fill: none;
     }
+
+    .legend {
+    display: flex;
+    border-color: rgb(224, 222, 222);
+    height: 50px;
+    width: 450px;
+    /* align-self: center; */
+    margin-top: 25px;
+    margin-left: 38%;
+    }
+
+    .legend span {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
   </style>
 </head>
 
@@ -57,6 +72,8 @@
 
     <strong>Visualization 1: General Exploration with Topography Map</strong><br>
     <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid lightgrey" fill = "gray"></svg>
+    <!-- create legend -->
+    <div id="legend" class="legend" style="border:2px solid lightgray"></div>
 
     <h3>2. GDP of Countries sorted by MBTI</h3>
     <div id="legend"></div>
@@ -217,24 +234,75 @@
           .attr("class", "countries")
           .attr("d", path)
           .style("fill", d => colorScale1(happiness_countries[d.properties.name]))
-          // .on('mouseover', mouseEntersPlot )
-          // .on('mouseout', mouseLeavesPlot );
+          .on('mouseover', mouseEntersPlot )
+          .on('mouseout', mouseLeavesPlot );
         
 
         map1.append("path").datum(countriesMesh)
           .attr("class", "outline_countries")
           .attr("d", path);
 
-        
-        
-        
-        // let momesh =  map.append("path")
-        //             .attr("class","mouseover outline")
-        //             .attr("d", "");
+        let momesh =  map1.append("path")
+                    .attr("class","mouseover outline")
+                    .attr("d", "");
 
-        // d3.selectAll(".countries").on("mouseenter", mouseEntersPlot);
-        // d3.selectAll(".countries").on("mouseout",  mouseLeavesPlot);
+        let tooltipWidth = 120;
+        let tooltipHeight = 40;
+        let tooltip = map1.append("g")
+          .attr("class","tooltip")
+          .attr("visibility","hidden");
+        tooltip.append("rect")
+          .attr("fill", "black")
+          .attr("opacity", 0.9)
+          .attr("x", -tooltipWidth / 2.0)
+          .attr("y", 0)
+          .attr("mapWidth1",tooltipWidth)
+          .attr("mapHeight1",tooltipHeight)
 
+        d3.selectAll(".countries").on("mouseenter", mouseEntersPlot);
+        d3.selectAll(".countries").on("mouseout",  mouseLeavesPlot);
+
+        function mouseEntersPlot() {
+      
+          tooltip.style("visibility","visible");
+
+          let state = d3.select(this);
+
+          state.attr("stroke","black")
+            .attr("stroke-width", 5);
+          
+          let countryID = countries.datum().id;
+          console.log(countries.datum());
+          
+          let bounds = path.bounds(countries.datum());  
+          let xPos = (bounds[0][0]+bounds[1][0])/2.0;
+          let yPos = bounds[1][1] - 15;
+
+          tooltip.attr("transform",`translate(${xPos},${yPos})`);
+        
+        
+          var mo = topojson.mesh(world, world.objects.countries, function(a, b) { return a.id === countryID || b.id === countryID; });
+          momesh.datum(mo).attr("d", path)
+        }
+  
+        function mouseLeavesPlot() {
+      
+          tooltip.style("visibility","hidden");
+
+          let state = d3.select(this);
+        
+          momesh.attr("d", "");
+      
+        }
+
+        // add legend
+        d3.select("#legend").append("span");
+          colorScale1.domain().forEach(function (d, i) {
+            d3.select("#legend")
+              .append("span")
+              .text(d)
+              .style("color", colorScale1(d))
+          });
         // Second Visualization
         // y axis
         let gdpExtent = d3.extent(Object.entries(mbtiGroup), ([k, v]) => mbtiGroup[k][0]['GDP']);
@@ -427,7 +495,6 @@
             .transition().duration(100)
             .attr('stroke-width', 0);
         });
-
 
       }
       requestData();
