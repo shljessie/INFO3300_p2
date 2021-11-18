@@ -201,6 +201,7 @@
         });
 
         console.log(happiness_data);
+
         // First Visualization
         var countries = topojson.feature(world, world.objects.countries);
         var countriesMesh = topojson.mesh(world, world.objects.countries);
@@ -306,6 +307,7 @@
               .text(d)
               .style("color", colorScale1(d))
           });
+          
         // Second Visualization
         // y axis
         let gdpExtent = d3.extent(Object.entries(mbtiGroup), ([k, v]) => mbtiGroup[k][0]['GDP']);
@@ -369,17 +371,12 @@
             })
         })
 
-
-
-        // const colorScale = d3.scaleOrdinal([`#46874f`, `#DB675B`, `#665adb`, `#b375bf`, `#b63e36`, `#b74a70`, `#946943`]);
         const colorScale = d3.scaleOrdinal(d3.schemeSet2);
 
         function updateBarsAnimated(mbtiKey) {
           const data = mbtiByCountryData[mbtiKey];
 
           data.sort((a, b) => d3.ascending(Object.entries(a)[0][1], Object.entries(b)[0][1]))
-
-          // bottomAxisG.transition().call(bottomAxis);
 
           chartArea2.selectAll('rect.bar').data(data)
             .join(
@@ -517,7 +514,7 @@
             .attr('stroke-width', 0);
         });
 
-        var legendText = ["Region 1", "Region 2", "Region 3", "Region 4","Region 5","Region 6"];
+        var legendText = ["  Northern America", "  Latin America & Caribbeans", "  Africa", "  Europe","  Oceania","    Asia"];
 
         var legend2 = d3.select("div#legend2")
                         .selectAll("g")
