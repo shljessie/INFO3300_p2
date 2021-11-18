@@ -102,7 +102,7 @@
       const margin1 = { top: 20, right: 20, bottom: 20, left: 20 };
       const mapWidth1 = width1 - margin1.left - margin1.right;
       const mapHeight1 = height1 - margin1.top - margin1.bottom;
-      const map1 = svg1.append("g")
+      const chartArea1 = svg1.append("g")
         .attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
 
       const svg2 = d3.select("svg#viz2");
@@ -234,71 +234,74 @@
         const colorScale1 = d3.scaleSequential(d3.interpolate("red", "yellow"))
           .domain(happinessExtent);
 
-        map1.selectAll(".countries").data(countries.features)
+        const g = chartArea1.append("g");
+
+        g.selectAll(".countries").data(countries.features)
           .join("path")
           .attr("class", "countries")
           .attr("d", path)
           .style("fill", d => colorScale1(happiness_countries[d.properties.name]))
-          .on('mouseover', mouseEntersPlot )
-          .on('mouseout', mouseLeavesPlot );
-        
+          .on('mouseover', mouseOverPlot)
+          .on('mouseout', mouseOutPlot );
 
-        map1.append("path").datum(countriesMesh)
+        g.append("path").datum(countriesMesh)
           .attr("class", "outline_countries")
           .attr("d", path);
 
-        let momesh =  map1.append("path")
+        let momesh = svg1.append("path")
                     .attr("class","mouseover outline")
                     .attr("d", "");
 
-        let tooltipWidth = 120;
-        let tooltipHeight = 40;
-        let tooltip = map1.append("g")
+        let tooltipWidth = 100;
+        let tooltipHeight = 50;
+        let tooltip = svg1.append("g")
           .attr("class","tooltip")
           .attr("visibility","hidden");
         tooltip.append("rect")
           .attr("fill", "black")
-          .attr("opacity", 0.9)
+          .attr("opacity", 0.8)
           .attr("x", -tooltipWidth / 2.0)
           .attr("y", 0)
           .attr("mapWidth1",tooltipWidth)
           .attr("mapHeight1",tooltipHeight)
 
-        d3.selectAll(".countries").on("mouseenter", mouseEntersPlot);
-        d3.selectAll(".countries").on("mouseout",  mouseLeavesPlot);
+        d3.selectAll(".countries").on("mouseover", mouseOverPlot);
+        d3.selectAll(".countries").on("mouseout",  mouseOutPlot);
 
-        function mouseEntersPlot() {
+        function mouseOverPlot() {
       
           tooltip.style("visibility","visible");
 
           let state = d3.select(this);
 
           state.attr("stroke","black")
-            .attr("stroke-width", 5);
-          
-          let countryID = countries.datum().id;
-          console.log(countries.datum());
-          
-          let bounds = path.bounds(countries.datum());  
-          let xPos = (bounds[0][0]+bounds[1][0])/2.0;
-          let yPos = bounds[1][1] - 15;
-
-          tooltip.attr("transform",`translate(${xPos},${yPos})`);
+            .attr("stroke-width", 3);
         
-        
-          var mo = topojson.mesh(world, world.objects.countries, function(a, b) { return a.id === countryID || b.id === countryID; });
+          var mo = topojson.mesh(world, world.objects.countries, function(a, b) { return a.id === ".country" || b.id === ".country"; });
           momesh.datum(mo).attr("d", path)
         }
   
-        function mouseLeavesPlot() {
+        function mouseOutPlot() {
       
           tooltip.style("visibility","hidden");
 
           let state = d3.select(this);
+
+          state.attr("stroke-width", 1);
         
           momesh.attr("d", "");
       
         }
+
+        // Referenced https://www.youtube.com/watch?v=9ZB1EgaJnBU for help with zooming in world map
+        svg1.call(d3.zoom()
+        // .on("zoom", () => {
+          // g.attr("transform", d3.event.transform);
+          // console.log("zoom")
+          .on("zoom", function ({transform}) {
+          console.log("test", transform);
+          g.attr("transform", transform);
+        }))
 
         // add legend
         d3.select("#legend").append("span");
