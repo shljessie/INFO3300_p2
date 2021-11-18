@@ -58,7 +58,7 @@
   </style>
 </head>
 
-<body>
+<body style="font-family: Gill Sans, sans-serif;">
   <h1>Project 2</h1>
   <h2>Seonghee Lee (sl994), Christy Song (cs966), Lydia Kim (lmk225), Sandy Jiang (sj458)</h2>
 
@@ -75,20 +75,20 @@
     <!-- create legend -->
     <div id="legend" class="legend" style="border:2px solid lightgray"></div>
 
-    <h3>2. GDP of Countries sorted by MBTI</h3>
-    <div id="legend"></div>
-    <p style="text-align: start;">i. The bar graph would show the gdp distribution by country <br>
-      ii. When the user clicks on a MBTI character, bar graphs are resorted by country with the largest distribution of
-      that mbti to the least <br>
-      iii. When the user hovers over each of the graph points (countries), a tooltip shows the distribution of the MBTI
-      of
-      that country. <br>
-      iv. MBTI Characters</p>
-    <strong>Visualization 2: GDP of Countries by each MBTI distribution</strong><br>
-    <div id="mbtiSelect" style="font-size: 30px;"></div>
+    <p style="font-size: 30px; margin-bottom: none;">GDP Distrubtion of Countries by MBTI</p>
+    <i style="margin-top: none;">How do GDP distributions and MBTI personalities relate to eachother?</i>
+    <br/>
+    <br/>
+    <p style="text-align: center; width:50%; margin-left: 25%;margin-right: 25%;">
+      This data visualization explores GDP distributions based on MBTI. What MBTI's do countries with <br/> 
+      higher GDP's have? Which MBTI has countries with low GDP's? 
+      What is the GDP distribution <br/>like for your MBTI?
+      <text style="color:red;">Click on each of the MBTI images to find out! </text>
+    </p>
+    <div id="mbtiSelect" style="font-size: 30px; border:1px solid lightgray; width: 150px; height: 40px; margin:auto;">  MBTI Type</div>
     <div style="display: flex;">
-      <svg id='viz2' width="800" height="600" style="margin:20px;margin-left: 50px;"></svg>
-      <div id="button-bar" style="width: 500px; margin-left: 30px;"> </div>
+      <svg id='viz2' width="880" height="600" style="margin:20px;margin-left: 50px;"></svg>
+      <div id="button-bar" style="width: 440px; height:fit-content; margin-left: 10px; margin-top: 50px; border:1px solid lightgray;"> </div>
     </div>
 
     <script>
@@ -104,7 +104,7 @@
       const svg2 = d3.select("svg#viz2");
       const width2 = svg2.attr("width");
       const height2 = svg2.attr("height");
-      const margin2 = { top: 5, right: 5, bottom: 20, left: 35 };
+      const margin2 = { top: 5, right: 0, bottom: 30, left: 55 };
       const chartWidth2 = width2 - margin2.left;
       const chartHeight2 = height2 - margin2.bottom;
       let chartArea2 = svg2.append("g").attr('id', 'chartarea2')
@@ -345,14 +345,15 @@
           img.src = "../images/" + d + ".png";
           let mbtiImage = document.getElementById('button-bar').appendChild(img);
           mbtiImage.id = d;
-          mbtiImage.style.height = '150px';
-          mbtiImage.style.width = '120px';
+          mbtiImage.style.height = '130px';
+          mbtiImage.style.width = '100px';
+          mbtiImage.style.padding = '2px';
 
           d3.select("#" + d)
             .on("mouseover", function () {
               mbtiImage.style.cursor = "pointer";
-              mbtiImage.style.width = "140";
-              mbtiImage.style.height = "160";
+              mbtiImage.style.width = "110";
+              mbtiImage.style.height = "140";
             })
             .on("click", function () {
               current_mbti = d;
@@ -362,8 +363,8 @@
             })
             .on("mouseout", function () {
               d3.select(this).style("background-color", "white");
-              mbtiImage.style.width = "120";
-              mbtiImage.style.height = "150";
+              mbtiImage.style.height = "130";
+              mbtiImage.style.width = "100";
             })
         })
 
@@ -420,20 +421,38 @@
         svg2.append("text")
           .attr("class", "x label")
           .attr("text-anchor", "end")
-          .style("font-size", 15)
-          .attr("x", (width2 / 2) + 130)
-          .attr("y", height2)
+          .style("font-size", 17)
+          .attr("x", (width2 / 2) + 160)
+          .attr("y", height2 -4)
           .text("Selected MBTI Distribution Ranking");
+
+        svg2.append("text")
+          .attr("class", "x label")
+          .attr("text-anchor", "end")
+          .style("font-size", 17)
+          .attr("x", 80)
+          .attr("y", height2 -4)
+          .text("least");
+        
+        svg2.append("text")
+          .attr("class", "x label")
+          .attr("text-anchor", "end")
+          .style("font-size", 17)
+          .attr("x", 880)
+          .attr("y", height2 -4)
+          .text("most");
 
         //  y axis
         svg2.append("text")
           .attr("class", "y label")
           .attr("text-anchor", "end")
-          .attr("x", (-height2 / 2) + 19)
-          .attr("y", 10)
+          .style("font-size", 20)
+          .attr("x", (-height2/2)+300 )
+          .attr("y", 4)
           .attr("dy", ".75em")
           .attr("transform", "rotate(-90)")
           .text("GDP");
+          
 
         let mouseover = svg2.append('g')
           .attr('class', 'mouseover')
@@ -480,8 +499,9 @@
           // console.log(Object.entries(d3.select(this).datum())[0]);
           d3.select(this)
             .transition().duration(100)
-            .attr('stroke-width', 1)
-            .attr('stroke', 'steelBlue')
+            .attr('stroke-width', 2)
+            .attr('stroke', 'red')
+            .style('box-shadow', '0 0 10px rgba(0, 0, 0, 0.5)')
             .style('cursor', 'pointer');
 
           mouseover.attr('visibility', '');
