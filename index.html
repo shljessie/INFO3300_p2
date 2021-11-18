@@ -88,7 +88,9 @@
     <div id="mbtiSelect" style="font-size: 30px; border:1px solid lightgray; width: 150px; height: 40px; margin:auto;">  MBTI Type</div>
     <div style="display: flex;">
       <svg id='viz2' width="880" height="600" style="margin:20px;margin-left: 50px;"></svg>
-      <div id="button-bar" style="width: 440px; height:fit-content; margin-left: 10px; margin-top: 50px; border:1px solid lightgray;"> </div>
+      <div id="button-bar" style="width: 440px; height:fit-content; margin-left: 10px; margin-top: 20px; ">
+      <div style="width: 440px; margin-bottom: 30px;">MBTI Types</div>
+      </div>
     </div>
 
     <script>
@@ -358,11 +360,9 @@
             .on("click", function () {
               current_mbti = d;
               updateBarsAnimated(d);
-              d3.select(this).style("background-color", "#ccc");
               selectText.innerText = d;
             })
             .on("mouseout", function () {
-              d3.select(this).style("background-color", "white");
               mbtiImage.style.height = "130";
               mbtiImage.style.width = "100";
             })
