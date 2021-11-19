@@ -94,7 +94,7 @@
       higher GDP's have? Which MBTI has countries with low GDP's?
       What is the GDP distribution like for your MBTI?
     </p>
-    <text style="color:red; line-height: 6;">Click on each of the MBTI images to find out! </text>
+    <text style="color:red; line-height: 6; font-size: 15pt;">Click on each of the MBTI images to find out! </text>
     <div id="mbtiSelect" style="font-size: 30px; border:1px solid lightgray; width: 150px; height: 40px; margin:auto;">
       MBTI Type</div>
     <div style="display: inline-block;">
@@ -494,9 +494,11 @@
         function updateMouseover(dat) {
           textbox.html('');
 
+          //return "$" + d3.format(",.2f")(d); }
+
           let d = mbtiGroup[Object.entries(dat)[0][0]][0];
           let country = `Country: ${d['Country']}`;
-          let gdp = `GDP per capita ($): $${d['GDP'].toString()}`;
+          let gdp = `GDP per capita ($): $${d3.format(",")(d['GDP']).toString()}`;
           let mbti = `${current_mbti} percentage: ${(d[current_mbti] * 100).toFixed(2)}%`;
 
           let maxWidth = Math.max(stringLen(country), stringLen(gdp), stringLen(mbti));
