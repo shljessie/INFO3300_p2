@@ -42,18 +42,9 @@
     }
 
     .legend {
-    display: flex;
     border-color: rgb(224, 222, 222);
-    height: 50px;
-    width: 450px;
-    /* align-self: center; */
-    margin-top: 25px;
-    margin-left: 38%;
-    }
-
-    .legend span {
-      padding-left: 10px;
-      padding-right: 10px;
+    height: 180px;
+    width: 400px;
     }
   </style>
 </head>
@@ -71,9 +62,26 @@
       bar graph, horizontal bar graphs, ).</p>
 
     <strong>Visualization 1: General Exploration with Topography Map</strong><br>
-    <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid lightgrey" fill = "gray"></svg>
+    <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid lightgrey" fill = "lightgray"></svg><br>
     <!-- create legend -->
-    <div id="legend" class="legend" style="border:2px solid lightgray"></div>
+    <svg id="legend" class="legend" style="border:2px solid lightgray">
+      <g>
+        <rect x="50" y="10" width = "30" height = "30" fill = "red"></rect>
+        <text x="100" y="30" fill = "black">Happiness Score less than 50</text>
+      </g>
+      <g>
+        <rect x="50" y="50" width = "30" height = "30" fill = "orange"></rect>
+        <text x="100" y="70" fill = "black">Happiness Score between 50 and 60</text>
+      </g>
+      <g>
+        <rect x="50" y="90" width = "30" height = "30" fill = "lemonchiffon"></rect>
+        <text x="100" y="110" fill = "black">Happiness Score between 60 and 70</text>
+      </g>
+      <g>
+        <rect x="50" y="130" width = "30" height = "30" fill = "yellow"></rect>
+        <text x="100" y="150" fill = "black">Happiness Score greater than 70</text>
+      </g>
+    </svg>
 
     <p style="font-size:30px; line-height: 1.6;">
       GDP Distrubtion of Countries by MBTI 
@@ -118,11 +126,8 @@
         // load all data
         const happiness_data = await d3.csv("./data/world_happiness.csv");
         let mbti_data = await d3.csv('./data/mbti_countries.csv');
-        console.log(mbti_data);
         const gdp_data = await d3.csv('./data/gdp_countries.csv');
-        console.log(gdp_data);
         const world = await d3.json("./data/countries-110m.json");
-        console.log(world);
         const mbti_keys = ['ENFJ', 'ENFP', 'ENTJ', 'ENTP', 'ESFJ', 'ESFP', 'ESTJ', 'ESTP', 'INFJ', 'INFP', 'INTJ', 'INTP', 'ISFJ', 'ISFP', 'ISTJ', 'ISTP'];
 
         // mbti_data: convert distribution to numbers & add -A and -T of same type
@@ -177,7 +182,6 @@
         let gdpGroup = Object.fromEntries(d3.group(gdp_data, d => d.Country));
 
         let mbtiGroup = Object.fromEntries(d3.group(mbti_data, d => d.Country));
-        console.log(mbtiGroup);
 
         // list of mbti countries only
         let mbti_countries = mbti_data.map(d => d['Country']);
@@ -201,8 +205,6 @@
           }
         });
 
-        console.log(happiness_data);
-
         // First Visualization
         var countries = topojson.feature(world, world.objects.countries);
         var countriesMesh = topojson.mesh(world, world.objects.countries);
@@ -219,20 +221,14 @@
         });
 
         let happinessGroup = Object.fromEntries(d3.group(happiness_data, d => d.country));
-        console.log(happinessGroup);
 
         let happiness_countries = happiness_data.map(d => d['country']);
 
         happiness_countries.forEach((c, i) => {
           happiness_countries[c] = Number(happinessGroup[c][0]['Healthy life expectancy']);
         })
-        console.log(happiness_countries);
 
         let happinessExtent = d3.extent(Object.entries(happinessGroup), ([k, v]) => happinessGroup[k][0]['Healthy life expectancy']);
-        console.log(happinessExtent);
-
-        const colorScale1 = d3.scaleSequential(d3.interpolate("red", "yellow"))
-          .domain(happinessExtent);
 
         const g = chartArea1.append("g");
 
@@ -240,9 +236,20 @@
           .join("path")
           .attr("class", "countries")
           .attr("d", path)
-          .style("fill", d => colorScale1(happiness_countries[d.properties.name]))
           .on('mouseover', mouseOverPlot)
-          .on('mouseout', mouseOutPlot );
+          .on('mouseout', mouseOutPlot )
+          .style("fill", d => {
+            let happiness_score = happiness_countries[d.properties.name]
+            if (happiness_score <= 50) {
+              return "red"
+            } else if (happiness_score > 50 && happiness_score <= 60 ) {
+              return "orange"
+            } else if (happiness_score > 60 && happiness_score <= 70 ) {
+              return "lemonchiffon"
+            } else if (happiness_score > 70) {
+              return "yellow"
+            }
+          })
 
         g.append("path").datum(countriesMesh)
           .attr("class", "outline_countries")
@@ -254,9 +261,11 @@
 
         let tooltipWidth = 100;
         let tooltipHeight = 50;
+
         let tooltip = svg1.append("g")
           .attr("class","tooltip")
           .attr("visibility","hidden");
+
         tooltip.append("rect")
           .attr("fill", "black")
           .attr("opacity", 0.8)
@@ -269,11 +278,9 @@
         d3.selectAll(".countries").on("mouseout",  mouseOutPlot);
 
         function mouseOverPlot() {
-      
           tooltip.style("visibility","visible");
 
           let state = d3.select(this);
-
           state.attr("stroke","black")
             .attr("stroke-width", 3);
         
@@ -282,35 +289,50 @@
         }
   
         function mouseOutPlot() {
-      
           tooltip.style("visibility","hidden");
-
           let state = d3.select(this);
-
-          state.attr("stroke-width", 1);
-        
-          momesh.attr("d", "");
-      
+          state.attr("stroke-width", 1);      
+          momesh.attr("d", "");  
         }
 
-        // Referenced https://www.youtube.com/watch?v=9ZB1EgaJnBU for help with zooming in world map
+        // Referenced https://www.youtube.com/watch?v=9ZB1EgaJnBU and https://dev.to/aslanart/cannot-read-property-transform-of-undefined-5bb4 for help with zooming in world map
         svg1.call(d3.zoom()
-        // .on("zoom", () => {
-          // g.attr("transform", d3.event.transform);
-          // console.log("zoom")
           .on("zoom", function ({transform}) {
-          console.log("test", transform);
-          g.attr("transform", transform);
-        }))
+            g.attr("transform", transform);
+          }))
 
         // add legend
-        d3.select("#legend").append("span");
-          colorScale1.domain().forEach(function (d, i) {
-            d3.select("#legend")
-              .append("span")
-              .text(d)
-              .style("color", colorScale1(d))
-          });
+        // d3.select("#legend").append("span");
+        //   colorScale1.domain().forEach(function (d, i) {
+        //     d3.select("#legend")
+        //       .append("span")
+        //       .text(d)
+        //       .style("color", colorScale1(d))
+        //   });
+        // var legendText1 = ["  Happiness Score less than 50", "  Happiness Score between 50 and 60", "  Happiness Score between 60 and 70", "  Happiness Score greater than 70"];
+
+        // var legend = d3.select("#legend")
+        //                 .selectAll("g")
+        //                 .data(colorScale.domain().slice().reverse())
+        //                 .enter()
+        //                 .append("g")
+        //                 .style("padding", 10)
+        //                 .attr("transform", function(d, i) { return "translate(0," + i * 10 + ")"; });
+
+  	    // legend.append("svg").attr("width", 18).attr("height", 18)
+        //       .append("rect")
+        //       .attr('x', 0)
+        //       .attr('y', 2)
+        //       .attr("width", 18)
+        //       .attr("height", 18)
+        //       .attr("fill", colorScale);
+
+  	    // legend.append("text")
+        //         .data(legendText)
+        //         .attr("x", 24)
+        //         .attr("y", 9)
+        //         .attr("dy", ".35em")
+        //         .text(function(d) { return d; });
           
         // Second Visualization
         // y axis
@@ -498,7 +520,6 @@
         };
 
         bars.on('mouseover', function (d) {
-          // console.log(Object.entries(d3.select(this).datum())[0]);
           d3.select(this)
             .transition().duration(100)
             .attr('stroke-width', 2)
