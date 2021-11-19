@@ -276,23 +276,23 @@
           .attr("mapHeight1",tooltipHeight)
         //Working
         console.log(happinessGroup);
-        function updateMouseover1(dat) {
-          textbox.html('');
-          let d = happinessGroup[0];
-          let country = `Country: ${d['.countries']}`;
-          let mbti = `${current_mbti} percentage: ${(d[current_mbti] * 100).toFixed(2)}%`;
+        // function updateMouseover1(dat) {
+        //   textbox.html('');
+        //   let d = happinessGroup[0];
+        //   let country = `Country: ${d['.countries']}`;
+        //   let mbti = `${current_mbti} percentage: ${(d[current_mbti] * 100).toFixed(2)}%`;
 
-          let maxWidth = Math.max(stringLen(country), stringLen(gdp), stringLen(mbti));
-          info.attr('width', maxWidth * 1.1);
+        //   let maxWidth = Math.max(stringLen(country), stringLen(gdp), stringLen(mbti));
+        //   info.attr('width', maxWidth * 1.1);
 
-          textbox.append('text').text(country)
-            .attr('x', 0).attr('y', 10);
-          textbox.append("text").text(gdp)
-            .attr("x", 0).attr("y", 25);
-          textbox.append("text").text(mbti)
-            .attr("x", 0).attr("y", 40);
+        //   textbox.append('text').text(country)
+        //     .attr('x', 0).attr('y', 10);
+        //   textbox.append("text").text(gdp)
+        //     .attr("x", 0).attr("y", 25);
+        //   textbox.append("text").text(mbti)
+        //     .attr("x", 0).attr("y", 40);
 
-        };
+        // };
 
         d3.selectAll(".countries").on("mouseover", mouseOverPlot);
         d3.selectAll(".countries").on("mouseout",  mouseOutPlot);
@@ -307,8 +307,8 @@
           var mo = topojson.mesh(world, world.objects.countries, function(a, b) { return a.id === ".country" || b.id === ".country"; });
           momesh.datum(mo).attr("d", path)
 
-          updateMouseover1(d3.select(this).datum());
-          console.log(updateMouseover1);
+          // updateMouseover1(d3.select(this).datum());
+          // console.log(updateMouseover1);
         }
   
         function mouseOutPlot() {
@@ -323,6 +323,44 @@
           .on("zoom", function ({transform}) {
             g.attr("transform", transform);
           }))
+        
+        svg1.selectAll(".countries").on("click",clicked);
+        
+        function clicked(event, d) {
+          console.log(d)
+
+          let bounds = path.bounds(d.geometry); 
+          let dx = bounds[1][0] - bounds[0][0]; // width of state/county
+          console.log(dx);
+          let dy = bounds[1][1] - bounds[0][1]; // height of state/county
+          let x = (bounds[0][0] + bounds[1][0]) / 2; // center x of state/county
+          let y = (bounds[0][1] + bounds[1][1]) / 2; // center y of state/county
+
+          // We want to make sure scale is within 1-10 when we click, so things don't zoom too far or too little
+          // To compute zoom, we want to make sure the bounding box "just" fits onscreen.
+          // dx / mapWidth gets us the portion of the screen the shape takes up without any zoom at all
+          //  the lower dx/mapWidth is, the more we need to zoom because the shape is smaller
+          // We find the max of dx/mapWidth, dy/mapHeight because we don't want to zoom farther (smaller values need more zoom)
+          // We do 1 or 0.9 divided by dx/mapWidth because we need larger numbers to zoom in. 0.9 allows us to pad things a bit
+          let scale = Math.max(1, Math.min(10, 0.9 / Math.max( dx / mapWidth1, 
+                                                              dy / mapHeight1 )));
+
+          // Think of the translate like a delta describing how much we need to move the map to move a point to a desired position
+          // Simplistically, it works like (desired position) - (current position) = (translation)
+          // In this case mapWidth/2, the center of the screen is the desired place for our viewport
+          // x*scale is the position we want to move to the center (scale is there because we need to move more when zoomed in)
+          let translate = [mapWidth1 / 2 - x * scale, mapHeight1 / 2 - y * scale];
+
+          // It's hard to programmatically adjust a zoom. The best way is to take the Identity (zoom transform where nothing is changed)
+          //  and then modify it using a .translate and .scale
+          let newTransform = d3.zoomIdentity
+                                .translate(translate[0],translate[1])
+                                .scale(scale);
+          // We can apply a new transform to the screen by using .call(zoom.tranform, newTransform)
+          // This is kinda the same thing as running zoom.transform(newTransform), but the chaining with .call allows us to add an animation
+          console.log(svg1.transition().duration(1000).call(zoom.transform, newTransform));
+
+        }
           
         // Second Visualization
         // y axis
