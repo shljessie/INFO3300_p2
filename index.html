@@ -58,44 +58,43 @@
   <p style="font-size: 14px;">Seonghee Lee (sl994), Christy Song (cs966), Lydia Kim (lmk225), Sandy Jiang (sj458)</p>
 
   <div class="center">
-    <h3>1. General Exploration with Topography Map</h3>
-    <p>i. The topography map can show different shades of a particular color for
-      each country to represent their happiness ranking from the dataset. <br>
-      ii. When a specific country is hovered over or selected, it can be outlined
-      and we can provide information on their GDP and other information such as the MBTI distributions (e.g. distributed
-      bar graph, horizontal bar graphs, ).</p>
+    <p style="font-size:30px; line-height: 1.6;">
+      Does a Country's Living Condition correlate with its MBTI Personality Type Distribution?
+      <br />
+      <text><i style="font-size: 17px;"></i></text>
+    </p>
+    <p style="text-align: start; width:65%; margin-left: 19.5%;margin-right: 25%;">
+      <b>What is an MBTI ?</b>
+      <br />
+      The Myers-Briggs Personality Type Indicator (MBTI) is a self-report questionnaire that divides
+      human personality types into 16 different categories.
+    </p>
 
-    <strong>Visualization 1: General Exploration with Topography Map</strong><br>
+    <p style="text-align: start; width:65%; margin-left: 19.5%;margin-right: 25%;">
+
+    </p>
+
+    <br />
+    <br />
+
+
+    <p style="font-size:30px; line-height: 1.6;">
+      MBTI Distribution based on Happiness Scores by Country
+      <br />
+      <text><i style="font-size: 17px;">How do Happiness Levels and MBTI personalities relate to eachother?</i></text>
+    </p>
+    <p style="text-align: start; width:50%; margin-left: 26.5%;margin-right: 25%;">
+      This data visualization explores MBTI distributions for each country based on their happiness scores.
+    </p>
     <text style="color:red; line-height: 2; font-size: 15pt;">Hover over any country on the map to preview its
       Happiness
       index and MBTI distribution information. <br /> Try zooming in and out and move the map to take a closer look on
       specific
       section of interest. <br /> Click on a country to zoom in to that country. <br /></text>
 
-    <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid lightgray"></svg><br>
-    <!-- create legend -->
-    <svg id="legend" class="legend" style="border:2px solid lightgray">
-      <g>
-        <rect x="50" y="10" width="30" height="30" fill="PapayaWhip" stroke="lightgray"></rect>
-        <text x="100" y="30" fill="black">Happiness Score <= 50</text>
-      </g>
-      <g>
-        <rect x="50" y="50" width="30" height="30" fill="LightYellow" stroke="lightgray"></rect>
-        <text x="100" y="70" fill="black"> 50 < Happiness Score <=60</text>
-      </g>
-      <g>
-        <rect x="50" y="90" width="30" height="30" fill="Yellow" stroke="lightgray"></rect>
-        <text x="100" y="110" fill="black">60 < Happiness Score <=70</text>
-      </g>
-      <g>
-        <rect x="50" y="130" width="30" height="30" fill="Gold" stroke="lightgray"></rect>
-        <text x="100" y="150" fill="black">Happiness Score > 70</text>
-      </g>
-      <g>
-        <rect x="50" y="170" width="30" height="30" fill="lightgray"></rect>
-        <text x="100" y="190" fill="black">No Happiness Score data found</text>
-      </g>
-    </svg>
+
+    <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid #ededed"></svg><br>
+    <div id="legend1" style=" margin-left: 50px; margin-top: 15px;"></div>
 
     <p style="font-size:30px; line-height: 1.6;">
       GDP Distribution of Countries by MBTI Personality Type
@@ -107,9 +106,9 @@
       higher GDP's have? Which MBTI has countries with low GDP's?
       What is the GDP distribution like for your MBTI?
     </p>
-    <text style="color:red; line-height: 6; font-size: 15pt;">Click on each of the MBTI images to find out OR hover over
+    <text style="color:red; line-height: 3; font-size: 15px;">Click on each of the MBTI images to find out OR hover over
       the bars to checkout information about a specific country! </text>
-    <div id="mbtiSelect" style="font-size: 30px; border:1px solid lightgray; width: 150px; height: 40px; margin:auto;">
+    <div id="mbtiSelect" style="font-size: 30px; border:1px solid #ededed; width: 150px; height: 40px; margin:auto;">
       MBTI Type</div>
     <div style="display: inline-block; margin-bottom: 300px;">
       <div id="legend2" style="width: 75vw; margin-left: 50px; margin-top: 15px;"></div>
@@ -265,17 +264,18 @@
           .style("fill", d => {
             let happiness_score = happiness_countries[d.properties.name]
             if (happiness_score <= 50) {
-              return "PapayaWhip"
+              return "#8d9478"
             } else if (happiness_score > 50 && happiness_score <= 60) {
-              return "LightYellow"
+              return "#b8cf74"
             } else if (happiness_score > 60 && happiness_score <= 70) {
-              return "Yellow"
+              return "#dcff73"
             } else if (happiness_score > 70) {
-              return "Gold"
+              return "#aeff00"
             } else {
               return "lightgray"
             }
-          })
+          }
+          )
 
         g.append("path").datum(countriesMesh)
           .attr("class", "outline_countries")
@@ -343,7 +343,7 @@
 
           textbox1.append('text').text(country)
             .attr('x', 0).attr('y', 10).style('font-weight', 'bold');
-          textbox1.append("text").text(happy)
+          textbox1.append("text").text(happy).style('font-style', 'italic')
             .attr("x", 0).attr("y", 30);
         };
 
@@ -386,6 +386,33 @@
         svg1.call(zoom);
 
         svg1.call(zoom.transform, d3.zoomIdentity);
+
+        let legendTextOne = [' No Data', ' Happiness Score <= 50', ' 50<Happiness Score <= 60', ' 60 < Happiness Score <= 70', ' 70 < Happiness Score']
+        var colorScaleOne = d3.scaleOrdinal().domain(legendTextOne).range(['lightgray', '#8d9478', '#b8cf74', '#dcff73', '#aeff00']);
+
+        let legend1 = d3.select("div#legend1");
+
+        legend1 = legend1.selectAll("g")
+          .data(colorScaleOne.domain().slice())
+          .enter()
+          .append("g")
+          .style("padding", 10)
+          .attr("transform", function (d, i) { return "translate(0," + i * 10 + ")"; });
+
+        legend1.append("svg").attr("width", 18).attr("height", 18)
+          .append("rect")
+          .attr('x', 0)
+          .attr('y', 2)
+          .attr("width", 18)
+          .attr("height", 18)
+          .attr("fill", colorScaleOne);
+
+        legend1.append("text")
+          .data(legendTextOne)
+          .attr("x", 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .text(function (d) { return d; });
 
         // Min Max Zoom
         function clicked(event, d) {
@@ -612,8 +639,9 @@
         var legendText = ["  Northern America", "  Latin America & Caribbeans", "  Africa", "  Europe", "  Oceania", "    Asia"];
 
         let legend2 = d3.select("div#legend2");
-
+        // console.log(colorScale.domain().slice().reverse());s
         legend2.append('text').text("Bars colored by continent: ").style('font-size', '14pt');
+        // console.log(colorScale);
 
         legend2 = legend2.selectAll("g")
           .data(colorScale.domain().slice().reverse())
