@@ -42,9 +42,9 @@
     }
 
     .legend {
-    border-color: rgb(224, 222, 222);
-    height: 180px;
-    width: 400px;
+      border-color: rgb(224, 222, 222);
+      height: 180px;
+      width: 400px;
     }
   </style>
 </head>
@@ -62,43 +62,45 @@
       bar graph, horizontal bar graphs, ).</p>
 
     <strong>Visualization 1: General Exploration with Topography Map</strong><br>
-    <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid lightgrey" fill = "lightgray"></svg><br>
+    <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid lightgrey"
+      fill="lightgray"></svg><br>
     <!-- create legend -->
     <svg id="legend" class="legend" style="border:2px solid lightgray">
       <g>
-        <rect x="50" y="10" width = "30" height = "30" fill = "red"></rect>
-        <text x="100" y="30" fill = "black">Happiness Score less than 50</text>
+        <rect x="50" y="10" width="30" height="30" fill="red"></rect>
+        <text x="100" y="30" fill="black">Happiness Score less than 50</text>
       </g>
       <g>
-        <rect x="50" y="50" width = "30" height = "30" fill = "orange"></rect>
-        <text x="100" y="70" fill = "black">Happiness Score between 50 and 60</text>
+        <rect x="50" y="50" width="30" height="30" fill="orange"></rect>
+        <text x="100" y="70" fill="black">Happiness Score between 50 and 60</text>
       </g>
       <g>
-        <rect x="50" y="90" width = "30" height = "30" fill = "lemonchiffon"></rect>
-        <text x="100" y="110" fill = "black">Happiness Score between 60 and 70</text>
+        <rect x="50" y="90" width="30" height="30" fill="lemonchiffon"></rect>
+        <text x="100" y="110" fill="black">Happiness Score between 60 and 70</text>
       </g>
       <g>
-        <rect x="50" y="130" width = "30" height = "30" fill = "yellow"></rect>
-        <text x="100" y="150" fill = "black">Happiness Score greater than 70</text>
+        <rect x="50" y="130" width="30" height="30" fill="yellow"></rect>
+        <text x="100" y="150" fill="black">Happiness Score greater than 70</text>
       </g>
     </svg>
 
     <p style="font-size:30px; line-height: 1.6;">
-      GDP Distrubtion of Countries by MBTI 
-      <br/>   
+      GDP Distrubtion of Countries by MBTI
+      <br />
       <text><i style="font-size: 17px;">How do GDP distributions and MBTI personalities relate to eachother?</i></text>
     </p>
     <p style="text-align: start; width:50%; margin-left: 26.5%;margin-right: 25%;">
-      This data visualization explores GDP distributions based on MBTI. What MBTI's do countries with  
-      higher GDP's have? Which MBTI has countries with low GDP's? 
+      This data visualization explores GDP distributions based on MBTI. What MBTI's do countries with
+      higher GDP's have? Which MBTI has countries with low GDP's?
       What is the GDP distribution like for your MBTI?
     </p>
     <text style="color:red; line-height: 6;">Click on each of the MBTI images to find out! </text>
-    <div id="mbtiSelect" style="font-size: 30px; border:1px solid lightgray; width: 150px; height: 40px; margin:auto;">  MBTI Type</div>
-    <div style="display: flex;">
+    <div id="mbtiSelect" style="font-size: 30px; border:1px solid lightgray; width: 150px; height: 40px; margin:auto;">
+      MBTI Type</div>
+    <div style="display: inline-block;">
       <svg id='viz2' width="880" height="600" style="margin:20px;margin-left: 50px;"></svg>
-      <div id="button-bar" style="width: 440px; height:fit-content; margin-left: 10px; margin-top: 20px; ">
-      <div style="width: 440px; margin-bottom: 30px;">MBTI Types</div>
+      <div id="button-bar" style="width: 440px; height:fit-content; display: inherit;">
+        <div style="width: 440px; margin-bottom: 30px;">MBTI Types</div>
       </div>
     </div>
     <div id="legend2" style="width: 75vw; align-items: center; margin-bottom: 90px;"></div>
@@ -212,7 +214,7 @@
           .fitSize([mapWidth1, mapHeight1], countries);
         var path = d3.geoPath().projection(projection1);
 
-        happiness_data.forEach( (d, i) => {
+        happiness_data.forEach((d, i) => {
           d['country'] = (d['Country name'].trim());
           if (d['country'] == 'United States') {
             d['country'] = 'United States of America'
@@ -237,15 +239,15 @@
           .attr("class", "countries")
           .attr("d", path)
           .on('mouseover', mouseOverPlot)
-          .on('mouseout', mouseOutPlot )
+          .on('mouseout', mouseOutPlot)
           .style("fill", d => {
             //Referenced https://www.youtube.com/watch?v=ha1toFtBfF8 for help with legend
             let happiness_score = happiness_countries[d.properties.name]
             if (happiness_score <= 50) {
               return "red"
-            } else if (happiness_score > 50 && happiness_score <= 60 ) {
+            } else if (happiness_score > 50 && happiness_score <= 60) {
               return "orange"
-            } else if (happiness_score > 60 && happiness_score <= 70 ) {
+            } else if (happiness_score > 60 && happiness_score <= 70) {
               return "lemonchiffon"
             } else if (happiness_score > 70) {
               return "yellow"
@@ -257,23 +259,23 @@
           .attr("d", path);
 
         let momesh = svg1.append("path")
-                    .attr("class","mouseover outline")
-                    .attr("d", "");
+          .attr("class", "mouseover outline")
+          .attr("d", "");
 
         let tooltipWidth = 100;
         let tooltipHeight = 50;
 
         let tooltip = svg1.append("g")
-          .attr("class","tooltip")
-          .attr("visibility","hidden");
+          .attr("class", "tooltip")
+          .attr("visibility", "hidden");
 
         tooltip.append("rect")
           .attr("fill", "black")
           .attr("opacity", 0.8)
           .attr("x", -tooltipWidth / 2.0)
           .attr("y", 0)
-          .attr("mapWidth1",tooltipWidth)
-          .attr("mapHeight1",tooltipHeight)
+          .attr("mapWidth1", tooltipWidth)
+          .attr("mapHeight1", tooltipHeight)
         //Working
         console.log(happinessGroup);
         function updateMouseover1(dat) {
@@ -295,35 +297,35 @@
         };
 
         d3.selectAll(".countries").on("mouseover", mouseOverPlot);
-        d3.selectAll(".countries").on("mouseout",  mouseOutPlot);
+        d3.selectAll(".countries").on("mouseout", mouseOutPlot);
 
         function mouseOverPlot() {
-          tooltip.style("visibility","visible");
+          tooltip.style("visibility", "visible");
 
           let state = d3.select(this);
-          state.attr("stroke","black")
+          state.attr("stroke", "black")
             .attr("stroke-width", 3);
-        
-          var mo = topojson.mesh(world, world.objects.countries, function(a, b) { return a.id === ".country" || b.id === ".country"; });
+
+          var mo = topojson.mesh(world, world.objects.countries, function (a, b) { return a.id === ".country" || b.id === ".country"; });
           momesh.datum(mo).attr("d", path)
 
           updateMouseover1(d3.select(this).datum());
           console.log(updateMouseover1);
         }
-  
+
         function mouseOutPlot() {
-          tooltip.style("visibility","hidden");
+          tooltip.style("visibility", "hidden");
           let state = d3.select(this);
-          state.attr("stroke-width", 1);      
-          momesh.attr("d", "");  
+          state.attr("stroke-width", 1);
+          momesh.attr("d", "");
         }
 
         // Referenced https://www.youtube.com/watch?v=9ZB1EgaJnBU and https://dev.to/aslanart/cannot-read-property-transform-of-undefined-5bb4 for help with zooming in world map
         svg1.call(d3.zoom()
-          .on("zoom", function ({transform}) {
+          .on("zoom", function ({ transform }) {
             g.attr("transform", transform);
           }))
-          
+
         // Second Visualization
         // y axis
         let gdpExtent = d3.extent(Object.entries(mbtiGroup), ([k, v]) => mbtiGroup[k][0]['GDP']);
@@ -437,7 +439,7 @@
           .attr("text-anchor", "end")
           .style("font-size", 17)
           .attr("x", (width2 / 2) + 160)
-          .attr("y", height2 -4)
+          .attr("y", height2 - 4)
           .text("Selected MBTI Distribution Ranking");
 
         svg2.append("text")
@@ -445,15 +447,15 @@
           .attr("text-anchor", "end")
           .style("font-size", 17)
           .attr("x", 80)
-          .attr("y", height2 -4)
+          .attr("y", height2 - 4)
           .text("least");
-        
+
         svg2.append("text")
           .attr("class", "x label")
           .attr("text-anchor", "end")
           .style("font-size", 17)
           .attr("x", 880)
-          .attr("y", height2 -4)
+          .attr("y", height2 - 4)
           .text("most");
 
         //  y axis
@@ -461,12 +463,12 @@
           .attr("class", "y label")
           .attr("text-anchor", "end")
           .style("font-size", 20)
-          .attr("x", (-height2/2)+300 )
+          .attr("x", (-height2 / 2) + 300)
           .attr("y", 4)
           .attr("dy", ".75em")
           .attr("transform", "rotate(-90)")
           .text("GDP");
-          
+
 
         let mouseover = svg2.append('g')
           .attr('class', 'mouseover')
@@ -529,30 +531,30 @@
             .attr('stroke-width', 0);
         });
 
-        var legendText = ["  Northern America", "  Latin America & Caribbeans", "  Africa", "  Europe","  Oceania","    Asia"];
+        var legendText = ["  Northern America", "  Latin America & Caribbeans", "  Africa", "  Europe", "  Oceania", "    Asia"];
 
         var legend2 = d3.select("div#legend2")
-                        .selectAll("g")
-                        .data(colorScale.domain().slice().reverse())
-                        .enter()
-                        .append("g")
-                        .style("padding", 10)
-                        .attr("transform", function(d, i) { return "translate(0," + i * 10 + ")"; });
+          .selectAll("g")
+          .data(colorScale.domain().slice().reverse())
+          .enter()
+          .append("g")
+          .style("padding", 10)
+          .attr("transform", function (d, i) { return "translate(0," + i * 10 + ")"; });
 
-  	    legend2.append("svg").attr("width", 18).attr("height", 18)
-              .append("rect")
-              .attr('x', 0)
-              .attr('y', 2)
-              .attr("width", 18)
-              .attr("height", 18)
-              .attr("fill", colorScale);
+        legend2.append("svg").attr("width", 18).attr("height", 18)
+          .append("rect")
+          .attr('x', 0)
+          .attr('y', 2)
+          .attr("width", 18)
+          .attr("height", 18)
+          .attr("fill", colorScale);
 
-  	    legend2.append("text")
-                .data(legendText)
-                .attr("x", 24)
-                .attr("y", 9)
-                .attr("dy", ".35em")
-                .text(function(d) { return d; });
+        legend2.append("text")
+          .data(legendText)
+          .attr("x", 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .text(function (d) { return d; });
 
       }
       requestData();
