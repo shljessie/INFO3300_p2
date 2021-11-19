@@ -67,19 +67,19 @@
     <!-- create legend -->
     <svg id="legend" class="legend" style="border:2px solid lightgray">
       <g>
-        <rect x="50" y="10" width="30" height="30" fill="red"></rect>
+        <rect x="50" y="10" width="30" height="30" fill="PapayaWhip"></rect>
         <text x="100" y="30" fill="black">Happiness Score <= 50</text>
       </g>
       <g>
-        <rect x="50" y="50" width="30" height="30" fill="orange"></rect>
+        <rect x="50" y="50" width="30" height="30" fill="LightYellow"></rect>
         <text x="100" y="70" fill="black"> 50 < Happiness Score <= 60</text>
       </g>
       <g>
-        <rect x="50" y="90" width="30" height="30" fill="lemonchiffon"></rect>
+        <rect x="50" y="90" width="30" height="30" fill="Yellow"></rect>
         <text x="100" y="110" fill="black">60 < Happiness Score <= 70</text>
       </g>
       <g>
-        <rect x="50" y="130" width="30" height="30" fill="yellow"></rect>
+        <rect x="50" y="130" width="30" height="30" fill="Gold"></rect>
         <text x="100" y="150" fill="black">Happiness Score > 70</text>
       </g>
       <g>
@@ -142,6 +142,8 @@
             d[mbti + '-A'] = Number(d[mbti + '-A']);
             d[mbti + '-T'] = Number(d[mbti + '-T']);
             d[mbti] = d[mbti + '-A'] + d[mbti + '-T'];
+            if (d['Country'] == 'United States') {
+            d['Country'] = 'United States of America'}
           });
         });
         let del_countries = ['Montenegro', 'Myanmar']
@@ -169,7 +171,8 @@
             d['Country'] = 'Trinidad and Tobago'
           } else if (d['Country'] == 'Saint Kitts & Nevis') {
             d['Country'] = 'Saint Kitts and Nevis'
-          }
+          } else if (d['Country'] == 'United States') {
+            d['Country'] = 'United States of America'}
 
           d['GDP ($ per capita)'] = Number(d['GDP ($ per capita)']);
           let reg = d['Region'];
@@ -247,13 +250,13 @@
           .style("fill", d => {
             let happiness_score = happiness_countries[d.properties.name]
             if (happiness_score <= 50) {
-              return "red"
+              return "PapayaWhip"
             } else if (happiness_score > 50 && happiness_score <= 60) {
-              return "orange"
+              return "LightYellow"
             } else if (happiness_score > 60 && happiness_score <= 70) {
-              return "lemonchiffon"
+              return "Yellow"
             } else if (happiness_score > 70) {
-              return "yellow"
+              return "Gold"
             } else {
               return "lightgray"
             }
@@ -291,7 +294,7 @@
           dummy.remove();
           return len;
         }
-
+        console.log(mbtiGroup)
         function updateMouseover1(dat) {
           textbox1.html('');
           let d = dat.properties.name;
