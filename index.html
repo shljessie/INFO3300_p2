@@ -27,6 +27,10 @@
       stroke-width: 1px;
     }
 
+    g.tooltip rect {
+      fill: yellow;
+    }
+
     g.mouseover text {
       font-family: Arial, sans-serif;
     }
@@ -62,6 +66,12 @@
       bar graph, horizontal bar graphs, ).</p>
 
     <strong>Visualization 1: General Exploration with Topography Map</strong><br>
+    <text style="color:red; line-height: 2; font-size: 15pt;">Hover over any country on the map to preview its
+      Happiness
+      index and MBTI distribution information. <br /> Try zooming in and out and move the map to take a closer look on
+      specific
+      section of interest. <br /> Click on a country to zoom in to that country. <br /></text>
+
     <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid lightgray"></svg><br>
     <!-- create legend -->
     <svg id="legend" class="legend" style="border:2px solid lightgray">
@@ -83,12 +93,12 @@
       </g>
       <g>
         <rect x="50" y="170" width="30" height="30" fill="lightgray"></rect>
-        <text x="100" y="190" fill="black">No data found</text>
+        <text x="100" y="190" fill="black">No Happiness Score data found</text>
       </g>
     </svg>
 
     <p style="font-size:30px; line-height: 1.6;">
-      GDP Distrubtion of Countries by MBTI
+      GDP Distribution of Countries by MBTI Personality Type
       <br />
       <text><i style="font-size: 17px;">How do GDP distributions and MBTI personalities relate to eachother?</i></text>
     </p>
@@ -226,7 +236,8 @@
         var path = d3.geoPath().projection(projection1);
 
         happiness_data.forEach((d, i) => {
-          d['country'] = (d['Country name'].trim());
+          d['country'] = d['Country name'].trim();
+
           if (d['country'] == 'United States') {
             d['country'] = 'United States of America'
           };
@@ -274,22 +285,22 @@
           .attr("class", "mouseover outline")
           .attr("d", "");
 
-        let tooltipWidth = 100;
-        let tooltipHeight = 50;
-
         let tooltip = svg1.append("g")
           .attr("class", "tooltip")
           .attr("visibility", "hidden");
 
-        tooltip.append("rect")
-          .attr("fill", "black")
-          .attr("opacity", 0.8)
-          .attr("x", -tooltipWidth / 2.0)
+        let tooltip_rect = tooltip.append("rect")
+          .attr('class', 'info-viz1')
+          .attr("visibility", "hidden")
+          .attr("x", 0)
           .attr("y", 0)
-          .attr("mapWidth1", tooltipWidth)
-          .attr("mapHeight1", tooltipHeight)
+          .attr('opacity', 0.8)
+          .attr("height", height1 * 0.74);
 
-        const textbox1 = svg1.append('g').attr('transform', "translate(5,5)").style('font-size', '10pt');
+        const textbox1 = svg1.append('g').attr('transform', "translate(5,5)")
+          .style('font-size', '10pt')
+          .attr("visibility", "hidden");
+
 
         function stringLen(str) {
           const dummy = mouseover.append('text').attr('class', 'dummytext').attr('visibility', 'hidden');
@@ -298,22 +309,40 @@
           dummy.remove();
           return len;
         }
+
         console.log(mbtiGroup)
         function updateMouseover1(dat) {
           textbox1.html('');
           let d = dat.properties.name;
+          if (d == 'Dem. Rep. Congo') {
+            d = 'Congo (Kinshasa)'
+          };
+          console.log(d)
           let country = `Country: ${d}`;
-          let happy = `Happiness Score: ${happiness_countries[d]}`;
+          let happy = `Happiness Score: ${happiness_countries[d] != undefined ? happiness_countries[d] : 'No data'
+            } `;
           let z = 50
-          mbti_keys.forEach((mbti, mbti_i) => {
-            let print_mbti = `${mbti} percentage: ${(mbtiGroup[d][0][mbti] * 100).toFixed(2)}%`;
-            textbox1.append("text").text(print_mbti)
-              .attr("x", 0).attr("y", z);
-            z = z + 20;
-          });
+
+          let maxWidth1 = Math.max(stringLen(country) + 10, stringLen(happy) - 15, 180);
+          tooltip_rect.attr('width', maxWidth1);
+
+          if (d in mbtiGroup) {
+            mbti_keys.forEach((mbti, mbti_i) => {
+              let print_mbti = `${mbti} percentage: ${(mbtiGroup[d][0][mbti] * 100).toFixed(2)}% `;
+              textbox1.append("text").text(print_mbti)
+                .attr("x", 0).attr("y", z);
+              z = z + 20;
+            });
+          } else {
+            textbox1.append('text')
+              .text("No MBTI data available...")
+              .style('font-size', '12pt')
+              .attr('x', 0)
+              .attr('y', z * 3.5)
+          }
 
           textbox1.append('text').text(country)
-            .attr('x', 0).attr('y', 10)
+            .attr('x', 0).attr('y', 10).style('font-weight', 'bold');
           textbox1.append("text").text(happy)
             .attr("x", 0).attr("y", 30);
         };
@@ -323,6 +352,8 @@
 
         function mouseOverPlot() {
           tooltip.style("visibility", "visible");
+          textbox1.style("visibility", "visible");
+          tooltip_rect.attr("visibility", "visible");
 
           let state = d3.select(this);
           state.attr("stroke", "black")
@@ -335,35 +366,50 @@
         }
 
         function mouseOutPlot() {
-          tooltip.style("visibility", "hidden");
+          tooltip.attr("visibility", "hidden");
+          tooltip_rect.attr("visibility", "hidden");
+          textbox1.style("visibility", "hidden");
+
           let state = d3.select(this);
           state.attr("stroke-width", 1);
           momesh.attr("d", "");
+
         }
 
-        svg1.call(d3.zoom()
+        let zoom = d3.zoom().scaleExtent([1, 10])
+          .translateExtent([[-50, -50], [width1 * 1.5, height1 * 1.5]])
+          .extent([[-50, -50], [width1 * 1.5, height1 * 1.5]])
           .on("zoom", function ({ transform }) {
             g.attr("transform", transform);
-          }))
+          });
+
+        svg1.call(zoom);
+
+        svg1.call(zoom.transform, d3.zoomIdentity);
 
         // Min Max Zoom
-        // svg1.selectAll(".countries").on("click",clicked);
+        function clicked(event, d) {
+          console.log(d)
 
-        // function clicked(event, d) {
-        //   let bounds = path.bounds(d.geometry);
-        //   let dx = bounds[1][0] - bounds[0][0]; // width of country
-        //   let dy = bounds[1][1] - bounds[0][1]; // height of country
+          let bounds = path.bounds(d.geometry);
+          let dx = bounds[1][0] - bounds[0][0];
+          let dy = bounds[1][1] - bounds[0][1];
+          let x = (bounds[0][0] + bounds[1][0]) / 2;
+          let y = (bounds[0][1] + bounds[1][1]) / 2;
 
-        //   let scale1 = Math.max(1, Math.min(10, 0.9 / Math.max( dx / mapWidth1,dy / mapHeight1 )));
+          let scale = Math.max(1, Math.min(10, 0.9 / Math.max(dx / width1,
+            dy / height1)));
 
-        //   let translate = [mapWidth1 / 2 * scale1, mapHeight1 / 2 * scale1];
+          let translate = [width1 / 2 - x * scale, height1 / 2 - y * scale];
 
-        //   let newTransform = d3.zoomIdentity
-        //                         .translate(translate[0],translate[1])
-        //                         .scale(scale1);
+          let newTransform = d3.zoomIdentity
+            .translate(translate[0], translate[1])
+            .scale(scale);
 
-        //   svg1.transition().duration(1000).call(d3.zoom.transform, newTransform);
-        // }
+          svg1.transition().duration(1000).call(zoom.transform, newTransform);
+
+        }
+        chartArea1.selectAll(".countries").on("click", clicked);
 
 
         // Second Visualization
@@ -380,11 +426,11 @@
           .tickSize(-chartWidth2);
 
         svg2.append('g').attr('class', 'y axis')
-          .attr("transform", `translate(${margin2.left},${margin2.top})`)
+          .attr("transform", `translate(${margin2.left}, ${margin2.top})`)
           .call(leftAxis);
 
         svg2.append('g').attr('class', 'y gridlines')
-          .attr("transform", `translate(${margin2.left},${margin2.top})`)
+          .attr("transform", `translate(${margin2.left}, ${margin2.top})`)
           .call(leftGridlines);
 
         // x axis 
@@ -393,7 +439,7 @@
 
         let bottomAxis = d3.axisBottom();
         const bottomAxisG = svg2.append("g")
-          .attr('transform', `translate(${margin2.left - 10},${chartHeight2 - 40})`);
+          .attr('transform', `translate(${margin2.left - 10}, ${chartHeight2 - 40})`);
 
         // get final data mbtis
         // const allKeys = Object.keys(mbtiByCountryData).sort();
@@ -527,8 +573,8 @@
           textbox.html('');
 
           let d = mbtiGroup[Object.entries(dat)[0][0]][0];
-          let country = `Country: ${d['Country']}`;
-          let gdp = `GDP per capita ($): $${d3.format(",")(d['GDP']).toString()}`;
+          let country = `Country: ${d['Country']} `;
+          let gdp = `GDP per capita($): $${d3.format(",")(d['GDP']).toString()} `;
           let mbti = `${current_mbti} percentage: ${(d[current_mbti] * 100).toFixed(2)}%`;
 
           let maxWidth = Math.max(stringLen(country), stringLen(gdp), stringLen(mbti));
