@@ -81,20 +81,26 @@
     <p style="font-size:30px; line-height: 1.6;">
       MBTI Distribution based on Happiness Scores by Country
       <br />
-      <text><i style="font-size: 17px;">How do Happiness Levels and MBTI personalities relate to eachother?</i></text>
+      <text><i style="font-size: 17px;">How do Happiness Levels and MBTI personalities relate to each other?</i></text>
     </p>
     <p style="text-align: start; width:50%; margin-left: 26.5%;margin-right: 25%;">
       This data visualization explores MBTI distributions for each country based on their happiness scores.
     </p>
-    <text style="color:red; line-height: 2; font-size: 15pt;">Hover over any country on the map to preview its
+    <text style="color:red; line-height: 2; font-size: 15px;">Hover over any country on the map to preview its
       Happiness
       index and MBTI distribution information. <br /> Try zooming in and out and move the map to take a closer look on
       specific
       section of interest. <br /> Click on a country to zoom in to that country. <br /></text>
 
+    <div id='map-cover' style='display: flex; flex-direction: column;'>
+      <div id='map-graph' style='display: flex; flex-direction: row; margin: 0 auto;'>
+        <svg id="choropleth" height="500" width="1000"
+          style=" margin-top: 20px; margin-bottom: 20px; margin-left: 5px; margin-right: 0; border:1px solid lightgray"></svg><br>
+        <svg id='country-info' style='margin: 20px; margin-right: 0; border:1px solid lightgray'></svg>
+      </div>
+      <!-- <div id="legend1" style=" margin-left: 50px; margin-top: 15px;"></div> -->
 
-    <svg id="choropleth" height="500" width="1000" style="margin:20px; border:1px solid #ededed"></svg><br>
-    <div id="legend1" style=" margin-left: 50px; margin-top: 15px;"></div>
+    </div>
 
     <p style="font-size:30px; line-height: 1.6;">
       GDP Distribution of Countries by MBTI Personality Type
@@ -129,6 +135,9 @@
       const mapHeight1 = height1 - margin1.top - margin1.bottom;
       const chartArea1 = svg1.append("g")
         .attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
+      const map_cover = d3.select('#map-cover');
+      // const map_graph = d3.select('#map-graph');
+      const happiness_country_info = d3.select('#country-info');
 
       const svg2 = d3.select("svg#viz2");
       const width2 = svg2.attr("width");
@@ -285,7 +294,7 @@
           .attr("class", "mouseover outline")
           .attr("d", "");
 
-        let tooltip = svg1.append("g")
+        let tooltip = happiness_country_info.append("g")
           .attr("class", "tooltip")
           .attr("visibility", "hidden");
 
@@ -295,9 +304,11 @@
           .attr("x", 0)
           .attr("y", 0)
           .attr('opacity', 0.8)
-          .attr("height", height1 * 0.74);
+          .attr('width', 300)
+          .attr("height", height1);
 
-        const textbox1 = svg1.append('g').attr('transform', "translate(5,5)")
+        const textbox1 = happiness_country_info.append('g')
+          .attr('transform', "translate(5,5)")
           .style('font-size', '10pt')
           .attr("visibility", "hidden");
 
@@ -321,17 +332,17 @@
           let country = `Country: ${d}`;
           let happy = `Happiness Score: ${happiness_countries[d] != undefined ? happiness_countries[d] : 'No data'
             } `;
-          let z = 50
+          let z = 60
 
-          let maxWidth1 = Math.max(stringLen(country) + 10, stringLen(happy) - 15, 180);
-          tooltip_rect.attr('width', maxWidth1);
+          // let maxWidth1 = Math.max(stringLen(country) + 10, stringLen(happy) - 15, 180);
+          // tooltip_rect.attr('width', maxWidth1);
 
           if (d in mbtiGroup) {
             mbti_keys.forEach((mbti, mbti_i) => {
               let print_mbti = `${mbti} percentage: ${(mbtiGroup[d][0][mbti] * 100).toFixed(2)}% `;
               textbox1.append("text").text(print_mbti)
-                .attr("x", 0).attr("y", z);
-              z = z + 20;
+                .attr("x", 0).attr("y", z).style('font-size', '13px');
+              z = z + 22;
             });
           } else {
             textbox1.append('text')
@@ -342,7 +353,7 @@
           }
 
           textbox1.append('text').text(country)
-            .attr('x', 0).attr('y', 10).style('font-weight', 'bold');
+            .attr('x', 0).attr('y', 10).style('font-weight', 'bold').style('font-size', '15px');
           textbox1.append("text").text(happy).style('font-style', 'italic')
             .attr("x", 0).attr("y", 30);
         };
@@ -369,6 +380,7 @@
           tooltip.attr("visibility", "hidden");
           tooltip_rect.attr("visibility", "hidden");
           textbox1.style("visibility", "hidden");
+          // tooltip_rect.attr('width', 10);
 
           let state = d3.select(this);
           state.attr("stroke-width", 1);
@@ -390,7 +402,11 @@
         let legendTextOne = [' No Data', ' Happiness Score <= 50', ' 50<Happiness Score <= 60', ' 60 < Happiness Score <= 70', ' 70 < Happiness Score']
         var colorScaleOne = d3.scaleOrdinal().domain(legendTextOne).range(['lightgray', '#8d9478', '#b8cf74', '#dcff73', '#aeff00']);
 
-        let legend1 = d3.select("div#legend1");
+
+        let legend1 = map_cover.append("div")
+          .attr('class', 'legend1')
+          .style('margin-left', '50px')
+          .style('margin-top', '15px');
 
         legend1 = legend1.selectAll("g")
           .data(colorScaleOne.domain().slice())
