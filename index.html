@@ -94,16 +94,19 @@
       higher GDP's have? Which MBTI has countries with low GDP's?
       What is the GDP distribution like for your MBTI?
     </p>
-    <text style="color:red; line-height: 6; font-size: 15pt;">Click on each of the MBTI images to find out! </text>
+    <text style="color:red; line-height: 6; font-size: 15pt;">Click on each of the MBTI images to find out OR hover over
+      the bars to checkout information about a specific country! </text>
     <div id="mbtiSelect" style="font-size: 30px; border:1px solid lightgray; width: 150px; height: 40px; margin:auto;">
       MBTI Type</div>
-    <div style="display: inline-block;">
-      <svg id='viz2' width="880" height="600" style="margin:20px;margin-left: 50px;"></svg>
-      <div id="button-bar" style="width: 440px; height:fit-content; display: inherit;">
-        <div style="width: 440px; margin-bottom: 30px;">MBTI Types</div>
+    <div style="display: inline-block; margin-bottom: 300px;">
+      <div id="legend2" style="width: 75vw; margin-left: 50px; margin-top: 15px;"></div>
+
+      <svg id='viz2' width="880" height="600" style="margin-right:20px; margin-left: 50px; margin-top: 10px"></svg>
+      <div id="button-bar"
+        style="width: 440px; height:fit-content; display: inherit; vertical-align: top; margin-top: 15px;">
+        <div style="width: 440px; margin-bottom: 5px; font-size: 18pt;">MBTI Types</div>
       </div>
     </div>
-    <div id="legend2" style="width: 75vw; align-items: center; margin-bottom: 90px;"></div>
 
     <script>
       const svg1 = d3.select("#choropleth");
@@ -130,7 +133,7 @@
         let mbti_data = await d3.csv('./data/mbti_countries.csv');
         const gdp_data = await d3.csv('./data/gdp_countries.csv');
         const world = await d3.json("./data/countries-110m.json");
-        const mbti_keys = ['ENFJ', 'ENFP', 'ENTJ', 'ENTP', 'ESFJ', 'ESFP', 'ESTJ', 'ESTP', 'INFJ', 'INFP', 'INTJ', 'INTP', 'ISFJ', 'ISFP', 'ISTJ', 'ISTP'];
+        const mbti_keys = ['ENTJ', 'INTJ', 'ENTP', 'INTP', 'ESTJ', 'ISTJ', 'ESFJ', 'ISFJ', 'ENFJ', 'INFJ', 'ENFP', 'INFP', 'ESTP', 'ISTP', 'ESFP', 'ISFP'];
 
         // mbti_data: convert distribution to numbers & add -A and -T of same type
         mbti_data.forEach((d, i) => {
@@ -356,14 +359,14 @@
           .attr('transform', `translate(${margin2.left - 10},${chartHeight2 - 40})`);
 
         // get final data mbtis
-        const allKeys = Object.keys(mbtiByCountryData).sort();
+        // const allKeys = Object.keys(mbtiByCountryData).sort();
         // var selectText = document.getElementById("selectSpecies");
 
         let current_mbti = 'ENTJ'
         var selectText = document.getElementById("mbtiSelect");
 
         // create buttons for each of the MBTI keys
-        allKeys.forEach(d => {
+        mbti_keys.forEach(d => {
           var img = document.createElement('img');
           img.src = "../images/" + d + ".png";
           let mbtiImage = document.getElementById('button-bar').appendChild(img);
@@ -494,8 +497,6 @@
         function updateMouseover(dat) {
           textbox.html('');
 
-          //return "$" + d3.format(",.2f")(d); }
-
           let d = mbtiGroup[Object.entries(dat)[0][0]][0];
           let country = `Country: ${d['Country']}`;
           let gdp = `GDP per capita ($): $${d3.format(",")(d['GDP']).toString()}`;
@@ -535,8 +536,11 @@
 
         var legendText = ["  Northern America", "  Latin America & Caribbeans", "  Africa", "  Europe", "  Oceania", "    Asia"];
 
-        var legend2 = d3.select("div#legend2")
-          .selectAll("g")
+        let legend2 = d3.select("div#legend2");
+
+        legend2.append('text').text("Bars colored by continent: ").style('font-size', '14pt');
+
+        legend2 = legend2.selectAll("g")
           .data(colorScale.domain().slice().reverse())
           .enter()
           .append("g")
