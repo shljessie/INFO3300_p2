@@ -239,6 +239,7 @@
           .on('mouseover', mouseOverPlot)
           .on('mouseout', mouseOutPlot )
           .style("fill", d => {
+            //Referenced https://www.youtube.com/watch?v=ha1toFtBfF8 for help with legend
             let happiness_score = happiness_countries[d.properties.name]
             if (happiness_score <= 50) {
               return "red"
@@ -273,6 +274,25 @@
           .attr("y", 0)
           .attr("mapWidth1",tooltipWidth)
           .attr("mapHeight1",tooltipHeight)
+        //Working
+        console.log(happinessGroup);
+        function updateMouseover1(dat) {
+          textbox.html('');
+          let d = happinessGroup[0];
+          let country = `Country: ${d['.countries']}`;
+          let mbti = `${current_mbti} percentage: ${(d[current_mbti] * 100).toFixed(2)}%`;
+
+          let maxWidth = Math.max(stringLen(country), stringLen(gdp), stringLen(mbti));
+          info.attr('width', maxWidth * 1.1);
+
+          textbox.append('text').text(country)
+            .attr('x', 0).attr('y', 10);
+          textbox.append("text").text(gdp)
+            .attr("x", 0).attr("y", 25);
+          textbox.append("text").text(mbti)
+            .attr("x", 0).attr("y", 40);
+
+        };
 
         d3.selectAll(".countries").on("mouseover", mouseOverPlot);
         d3.selectAll(".countries").on("mouseout",  mouseOutPlot);
@@ -286,6 +306,9 @@
         
           var mo = topojson.mesh(world, world.objects.countries, function(a, b) { return a.id === ".country" || b.id === ".country"; });
           momesh.datum(mo).attr("d", path)
+
+          updateMouseover1(d3.select(this).datum());
+          console.log(updateMouseover1);
         }
   
         function mouseOutPlot() {
@@ -300,39 +323,6 @@
           .on("zoom", function ({transform}) {
             g.attr("transform", transform);
           }))
-
-        // add legend
-        // d3.select("#legend").append("span");
-        //   colorScale1.domain().forEach(function (d, i) {
-        //     d3.select("#legend")
-        //       .append("span")
-        //       .text(d)
-        //       .style("color", colorScale1(d))
-        //   });
-        // var legendText1 = ["  Happiness Score less than 50", "  Happiness Score between 50 and 60", "  Happiness Score between 60 and 70", "  Happiness Score greater than 70"];
-
-        // var legend = d3.select("#legend")
-        //                 .selectAll("g")
-        //                 .data(colorScale.domain().slice().reverse())
-        //                 .enter()
-        //                 .append("g")
-        //                 .style("padding", 10)
-        //                 .attr("transform", function(d, i) { return "translate(0," + i * 10 + ")"; });
-
-  	    // legend.append("svg").attr("width", 18).attr("height", 18)
-        //       .append("rect")
-        //       .attr('x', 0)
-        //       .attr('y', 2)
-        //       .attr("width", 18)
-        //       .attr("height", 18)
-        //       .attr("fill", colorScale);
-
-  	    // legend.append("text")
-        //         .data(legendText)
-        //         .attr("x", 24)
-        //         .attr("y", 9)
-        //         .attr("dy", ".35em")
-        //         .text(function(d) { return d; });
           
         // Second Visualization
         // y axis
