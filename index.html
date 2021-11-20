@@ -55,7 +55,7 @@
 
 <body style="font-family: Gill Sans, sans-serif;">
   <p>Project 2 - INFO 3300 Data Driven Web Applications</p>
-  <p style="font-size: 14px;">Seonghee Lee (sl994), Christy Song (cs966), Lydia Kim (lmk225), Sandy Jiang (sj458)</p>
+  <p style="font-size: 14px;"> Christy Song (cs966), Seonghee Lee (sl994), Lydia Kim (lmk225), Sandy Jiang (sj458)</p>
 
   <div class="center">
     <p style="font-size:30px; line-height: 1.6;">
@@ -86,11 +86,12 @@
     <p style="text-align: start; width:50%; margin-left: 26.5%;margin-right: 25%;">
       This data visualization explores MBTI distributions for each country based on their happiness scores.
     </p>
-    <text style="color:red; line-height: 2; font-size: 15px;">Hover over any country on the map to preview its
+    <text style="color:red; line-height: 2; font-size: 15px;">Hover over any country on the map to view its
       Happiness
-      index and MBTI distribution information. <br /> Try zooming in and out and move the map to take a closer look on
+      index and MBTI distribution information on the box on the right-side of the map. <br /> Try zooming in and out and
+      move the map to take a closer look on
       specific
-      section of interest. <br /> Click on a country to zoom in to that country. <br /></text>
+      section of interest. <br /> Click on a country to zoom in its location. <br /></text>
 
     <div id='map-cover' style='display: flex; flex-direction: column;'>
       <div id='map-graph' style='display: flex; flex-direction: row; margin: 0 auto;'>
@@ -307,6 +308,20 @@
           .attr('width', 300)
           .attr("height", height1);
 
+
+        //bargraph instead
+        let country_info_bars_svg = happiness_country_info.append('svg')
+          .attr('width', 300)
+          .attr('height', height1)
+          .style('background-color', 'yellow')
+          .attr('id', 'happiness-bars');
+
+        let country_info_bars_svg_width = country_info_bars_svg.attr('width');
+        let country_info_bars_svg_height = country_info_bars_svg.attr('height');
+        // let chart_country_mbti = country_info_bars_svg.append('g').attr('id', 'chartarea_mbti');
+
+
+        // textbox-viz1
         const textbox1 = happiness_country_info.append('g')
           .attr('transform', "translate(5,5)")
           .style('font-size', '10pt')
@@ -323,15 +338,101 @@
 
         console.log(mbtiGroup)
         function updateMouseover1(dat) {
-          textbox1.html('');
+
+          //bargraph
+          country_info_bars_svg.html('');
+
           let d = dat.properties.name;
           if (d == 'Dem. Rep. Congo') {
             d = 'Congo (Kinshasa)'
           };
-          console.log(d)
           let country = `Country: ${d}`;
           let happy = `Happiness Score: ${happiness_countries[d] != undefined ? happiness_countries[d] : 'No data'
             } `;
+
+          country_info_bars_svg.append('text').text(country)
+            .attr('x', 5).attr('y', 15).style('font-weight', 'bold').style('font-size', '15px');
+          country_info_bars_svg.append("text").text(happy).style('font-style', 'italic')
+            .attr("x", 5).attr("y", 35);
+
+          let mbtiScale = d3.scaleLinear()
+            .domain([0, 30]).range([40, country_info_bars_svg_width - 10]);
+
+          let mbtitypesScale = d3.scaleBand().domain(mbti_keys).range([50, country_info_bars_svg_height - 30]).padding(0.1);
+          mbtitypesScale.domain(mbti_keys);
+
+          let leftAxis = d3.axisLeft(mbtitypesScale);
+          // const leftAxisG = country_info_bars_svg.append("g");
+
+          let bottomAxis = d3.axisBottom(mbtiScale);
+          let bottomGridlines = d3.axisBottom(mbtiScale)
+            .tickFormat('').tickSize(country_info_bars_svg_height - 80);
+
+          if (d in mbtiGroup) {
+            let country_mbtis = mbtiGroup[d][0];
+            console.log(country_mbtis)
+
+            country_info_bars_svg.append('g')
+              .attr('class', 'x axis')
+              .attr('transform', `translate(${40}, ${0})`)
+              .call(leftAxis);
+
+            country_info_bars_svg.append('g')
+              .attr('class', 'y axis')
+              .attr('transform', `translate(${0}, ${country_info_bars_svg_height - 30})`)
+              .call(bottomAxis);
+
+            country_info_bars_svg.append('g')
+              .attr('class', 'y gridlines')
+              .attr('transform', `translate(${0}, ${50})`)
+              .call(bottomGridlines);
+            let chart_country_mbti = country_info_bars_svg.append('g').attr('id', 'chartarea_mbti');
+
+            mbti_keys.forEach((m) => {
+
+              chart_country_mbti.append('rect')
+                .attr('class', 'mbti-bar')
+                .attr('fill', 'steelBlue')
+                .attr('x', '40')
+                .attr('y', mbtitypesScale(m))
+                .attr('height', 20)
+                .attr('width', mbtiScale(country_mbtis[m] * 100))
+                .attr('country', m);
+
+              let print_mbti = `${(country_mbtis[m] * 100).toFixed(2)}% `;
+
+              chart_country_mbti.append('text')
+                .text(print_mbti)
+                .attr("x", mbtiScale(country_mbtis[m] * 100) + 42)
+                .attr("y", mbtitypesScale(m) + 15);
+
+            });
+
+            country_info_bars_svg.append("text")
+              .attr("text-anchor", "end")
+              .style("font-size", 10)
+              .attr("x", country_info_bars_svg_width)
+              .attr("y", country_info_bars_svg_height - 4)
+              .text("MBTI Distribution (%)");
+
+          } else {
+            country_info_bars_svg.append('text')
+              .text("No MBTI data available...")
+              .style('font-size', '12pt')
+              .attr('x', 0)
+              .attr('y', height1 / 2)
+          }
+
+          // textbox
+          // textbox1.html('');
+          // let d = dat.properties.name;
+          // if (d == 'Dem. Rep. Congo') {
+          //   d = 'Congo (Kinshasa)'
+          // };
+          console.log(d)
+          // let country = `Country: ${d}`;
+          // let happy = `Happiness Score: ${happiness_countries[d] != undefined ? happiness_countries[d] : 'No data'
+          //   } `;
           let z = 60
 
           // let maxWidth1 = Math.max(stringLen(country) + 10, stringLen(happy) - 15, 180);
@@ -352,19 +453,20 @@
               .attr('y', z * 3.5)
           }
 
-          textbox1.append('text').text(country)
-            .attr('x', 0).attr('y', 10).style('font-weight', 'bold').style('font-size', '15px');
-          textbox1.append("text").text(happy).style('font-style', 'italic')
-            .attr("x", 0).attr("y", 30);
+          // textbox1.append('text').text(country)
+          //   .attr('x', 0).attr('y', 10).style('font-weight', 'bold').style('font-size', '15px');
+          // textbox1.append("text").text(happy).style('font-style', 'italic')
+          //   .attr("x", 0).attr("y", 30);
         };
 
         d3.selectAll(".countries").on("mouseover", mouseOverPlot);
         d3.selectAll(".countries").on("mouseout", mouseOutPlot);
 
         function mouseOverPlot() {
-          tooltip.style("visibility", "visible");
-          textbox1.style("visibility", "visible");
+          // tooltip.style("visibility", "visible");
+          // textbox1.style("visibility", "visible");
           tooltip_rect.attr("visibility", "visible");
+          country_info_bars_svg.style('visibility', 'visible');
 
           let state = d3.select(this);
           state.attr("stroke", "black")
@@ -381,6 +483,7 @@
           tooltip_rect.attr("visibility", "hidden");
           textbox1.style("visibility", "hidden");
           // tooltip_rect.attr('width', 10);
+          country_info_bars_svg.style('visibility', 'hidden');
 
           let state = d3.select(this);
           state.attr("stroke-width", 1);
