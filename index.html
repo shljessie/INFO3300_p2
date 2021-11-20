@@ -24,11 +24,11 @@
     g.mouseover rect {
       fill: white;
       stroke: black;
-      stroke-width: 1px;
+      stroke-width: 0.2px;
     }
 
     g.tooltip rect {
-      fill: yellow;
+      fill: white;
     }
 
     g.mouseover text {
@@ -41,7 +41,7 @@
 
     .outline_countries {
       stroke: black;
-      stroke-width: 1px;
+      stroke-width: 0.2px;
       fill: none;
     }
 
@@ -54,16 +54,21 @@
 </head>
 
 <body style="font-family: Gill Sans, sans-serif;">
-  <p>Project 2 - INFO 3300 Data Driven Web Applications</p>
-  <p style="font-size: 14px;"> Christy Song (cs966), Seonghee Lee (sl994), Lydia Kim (lmk225), Sandy Jiang (sj458)</p>
-
+  <p style="margin-left: 12px; margin-top: 28px;">
+    Project 2 - INFO 3300 Data Driven Web Applications
+  </p>
+  <p style="font-size: 14px; margin-left: 12px;"> 
+    Christy Song (cs966), Seonghee Lee (sl994), Lydia Kim (lmk225), Sandy Jiang (sj458)
+  </p>
+  <br />
+  <br />
   <div class="center">
     <p style="font-size:30px; line-height: 1.6;">
       Does a Country's Living Condition correlate with its MBTI Personality Type Distribution?
       <br />
-      <text><i style="font-size: 17px;"></i></text>
+      <text>We explore the relationship between MBTI and a country's GDP and Happiness Score in these visualizations.</text>
     </p>
-    <p style="text-align: start; width:65%; margin-left: 19.5%;margin-right: 25%;">
+    <p style="text-align: start; width:70%; margin-left: 25%; margin-right: 25%;">
       <b>What is an MBTI ?</b>
       <br />
       The Myers-Briggs Personality Type Indicator (MBTI) is a self-report questionnaire that divides
@@ -81,27 +86,28 @@
     <p style="font-size:30px; line-height: 1.6;">
       MBTI Distribution based on Happiness Scores by Country
       <br />
-      <text><i style="font-size: 17px;">How do Happiness Levels and MBTI personalities relate to each other?</i></text>
+      <text><i style="font-size: 18px;">How do Happiness Levels and MBTI personalities relate to each other?</i></text>
     </p>
-    <p style="text-align: start; width:50%; margin-left: 26.5%;margin-right: 25%;">
+    <p style="text-align: start; width:55%; margin-left: 26.5%;margin-right: 25%; font-size: 18px;">
       This data visualization explores MBTI distributions for each country based on their happiness scores.
     </p>
-    <text style="color:red; line-height: 2; font-size: 15px;">Hover over any country on the map to view its
-      Happiness
-      index and MBTI distribution information on the box on the right-side of the map. <br /> Try zooming in and out and
-      move the map to take a closer look on
-      specific
-      section of interest. <br /> Click on a country to zoom in its location. <br /></text>
+    <text style="color:red; line-height: 1; font-size: 18px;">
+      Hover over countries to view Happiness index and MBTI distribution. <br /> 
+      Zoom in or Click on a country to zoom to view its specific location. <br /></text>
 
     <div id='map-cover' style='display: flex; flex-direction: column;'>
       <div id='map-graph' style='display: flex; flex-direction: row; margin: 0 auto;'>
         <svg id="choropleth" height="500" width="1000"
-          style=" margin-top: 20px; margin-bottom: 20px; margin-left: 5px; margin-right: 0; border:1px solid lightgray"></svg><br>
+          style=" margin-top: 20px; margin-bottom: 20px; margin-left: 5px; margin-right: 0;"></svg><br>
         <svg id='country-info' style='margin: 20px; margin-right: 0; border:1px solid lightgray'></svg>
       </div>
-      <!-- <div id="legend1" style=" margin-left: 50px; margin-top: 15px;"></div> -->
 
     </div>
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
 
     <p style="font-size:30px; line-height: 1.6;">
       GDP Distribution of Countries by MBTI Personality Type
@@ -131,7 +137,7 @@
       const svg1 = d3.select("#choropleth");
       const width1 = svg1.attr("width");
       const height1 = svg1.attr("height");
-      const margin1 = { top: 20, right: 20, bottom: 20, left: 20 };
+      const margin1 = { top: 0, right: 5, bottom:0, left: 5 };
       const mapWidth1 = width1 - margin1.left - margin1.right;
       const mapHeight1 = height1 - margin1.top - margin1.bottom;
       const chartArea1 = svg1.append("g")
@@ -309,17 +315,14 @@
           .attr("height", height1);
 
 
-        //bargraph instead
+        //bargraph
         let country_info_bars_svg = happiness_country_info.append('svg')
           .attr('width', 300)
           .attr('height', height1)
-          .style('background-color', 'yellow')
           .attr('id', 'happiness-bars');
 
         let country_info_bars_svg_width = country_info_bars_svg.attr('width');
         let country_info_bars_svg_height = country_info_bars_svg.attr('height');
-        // let chart_country_mbti = country_info_bars_svg.append('g').attr('id', 'chartarea_mbti');
-
 
         // textbox-viz1
         const textbox1 = happiness_country_info.append('g')
@@ -362,7 +365,6 @@
           mbtitypesScale.domain(mbti_keys);
 
           let leftAxis = d3.axisLeft(mbtitypesScale);
-          // const leftAxisG = country_info_bars_svg.append("g");
 
           let bottomAxis = d3.axisBottom(mbtiScale);
           let bottomGridlines = d3.axisBottom(mbtiScale)
@@ -386,13 +388,14 @@
               .attr('class', 'y gridlines')
               .attr('transform', `translate(${0}, ${50})`)
               .call(bottomGridlines);
+
             let chart_country_mbti = country_info_bars_svg.append('g').attr('id', 'chartarea_mbti');
 
             mbti_keys.forEach((m) => {
 
               chart_country_mbti.append('rect')
                 .attr('class', 'mbti-bar')
-                .attr('fill', 'steelBlue')
+                .attr('fill', 'royalblue')
                 .attr('x', '40')
                 .attr('y', mbtitypesScale(m))
                 .attr('height', 20)
@@ -410,7 +413,7 @@
 
             country_info_bars_svg.append("text")
               .attr("text-anchor", "end")
-              .style("font-size", 10)
+              .style("font-size", 8)
               .attr("x", country_info_bars_svg_width)
               .attr("y", country_info_bars_svg_height - 4)
               .text("MBTI Distribution (%)");
@@ -423,20 +426,8 @@
               .attr('y', height1 / 2)
           }
 
-          // textbox
-          // textbox1.html('');
-          // let d = dat.properties.name;
-          // if (d == 'Dem. Rep. Congo') {
-          //   d = 'Congo (Kinshasa)'
-          // };
-          console.log(d)
-          // let country = `Country: ${d}`;
-          // let happy = `Happiness Score: ${happiness_countries[d] != undefined ? happiness_countries[d] : 'No data'
-          //   } `;
+          console.log(d);
           let z = 60
-
-          // let maxWidth1 = Math.max(stringLen(country) + 10, stringLen(happy) - 15, 180);
-          // tooltip_rect.attr('width', maxWidth1);
 
           if (d in mbtiGroup) {
             mbti_keys.forEach((mbti, mbti_i) => {
@@ -452,25 +443,19 @@
               .attr('x', 0)
               .attr('y', z * 3.5)
           }
-
-          // textbox1.append('text').text(country)
-          //   .attr('x', 0).attr('y', 10).style('font-weight', 'bold').style('font-size', '15px');
-          // textbox1.append("text").text(happy).style('font-style', 'italic')
-          //   .attr("x", 0).attr("y", 30);
         };
 
         d3.selectAll(".countries").on("mouseover", mouseOverPlot);
         d3.selectAll(".countries").on("mouseout", mouseOutPlot);
 
         function mouseOverPlot() {
-          // tooltip.style("visibility", "visible");
-          // textbox1.style("visibility", "visible");
           tooltip_rect.attr("visibility", "visible");
           country_info_bars_svg.style('visibility', 'visible');
 
           let state = d3.select(this);
-          state.attr("stroke", "black")
-            .attr("stroke-width", 3);
+          state.attr("stroke", "darkgreen")
+               .style("opacity","0.7")
+               .attr("stroke-width", 1.5);
 
           var mo = topojson.mesh(world, world.objects.countries, function (a, b) { return a.id === ".country" || b.id === ".country"; });
           momesh.datum(mo).attr("d", path)
@@ -482,11 +467,10 @@
           tooltip.attr("visibility", "hidden");
           tooltip_rect.attr("visibility", "hidden");
           textbox1.style("visibility", "hidden");
-          // tooltip_rect.attr('width', 10);
           country_info_bars_svg.style('visibility', 'hidden');
 
           let state = d3.select(this);
-          state.attr("stroke-width", 1);
+          state.style("opacity","1").attr("stroke", "black").attr("stroke-width", 0.2);
           momesh.attr("d", "");
 
         }
