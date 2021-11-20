@@ -66,7 +66,7 @@
     <p style="font-size:30px; line-height: 1.6;">
       Does a Country's Living Condition correlate with its MBTI Personality Type Distribution?
       <br />
-      <text>We explore the relationship between MBTI and a country's GDP and Happiness Score in these
+      <text>We explore the relationship between MBTI and a country's GDP per capita value and Happiness Score in these
         visualizations.</text>
     </p>
     <p style="text-align: start; width:70%; margin-left: 25%; margin-right: 25%;">
@@ -111,14 +111,16 @@
     <br />
 
     <p style="font-size:30px; line-height: 1.6;">
-      GDP Distribution of Countries by MBTI Personality Type
+      GDP per capita Distribution of Countries by MBTI Personality Type
       <br />
-      <text><i style="font-size: 17px;">How do GDP distributions and MBTI personalities relate to eachother?</i></text>
+      <text><i style="font-size: 17px;">How do GDP per capita distributions and MBTI personalities relate to
+          eachother?</i></text>
     </p>
     <p style="text-align: start; width:50%; margin-left: 26.5%;margin-right: 25%;">
-      This data visualization explores GDP distributions based on MBTI. What MBTI's do countries with
-      higher GDP's have? Which MBTI has countries with low GDP's?
-      What is the GDP distribution like for your MBTI?
+      This data visualization explores GDP per capita distributions based on MBTI. Does country with higher distribution
+      of your MBTI type have higher GDP per capita value? Countries that have more distribution of which MBTI generally
+      have lower GDP
+      per capita?
     </p>
     <text style="color:red; line-height: 3; font-size: 15px;">Click on each of the MBTI images to find out OR hover over
       the bars to checkout information about a specific country! </text>
@@ -679,12 +681,12 @@
         svg2.append("text")
           .attr("class", "y label")
           .attr("text-anchor", "end")
-          .style("font-size", 20)
+          .style("font-size", 16)
           .attr("x", (-height2 / 2) + 300)
           .attr("y", 4)
           .attr("dy", ".75em")
           .attr("transform", "rotate(-90)")
-          .text("GDP");
+          .text("GDP per capita ($)");
 
 
         let mouseover = svg2.append('g')
