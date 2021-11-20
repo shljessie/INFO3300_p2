@@ -28,7 +28,7 @@
     }
 
     g.tooltip rect {
-      fill: white;
+      fill: #fffbc4;
     }
 
     g.mouseover text {
@@ -57,7 +57,7 @@
   <p style="margin-left: 12px; margin-top: 28px;">
     Project 2 - INFO 3300 Data Driven Web Applications
   </p>
-  <p style="font-size: 14px; margin-left: 12px;"> 
+  <p style="font-size: 14px; margin-left: 12px;">
     Christy Song (cs966), Seonghee Lee (sl994), Lydia Kim (lmk225), Sandy Jiang (sj458)
   </p>
   <br />
@@ -66,7 +66,8 @@
     <p style="font-size:30px; line-height: 1.6;">
       Does a Country's Living Condition correlate with its MBTI Personality Type Distribution?
       <br />
-      <text>We explore the relationship between MBTI and a country's GDP and Happiness Score in these visualizations.</text>
+      <text>We explore the relationship between MBTI and a country's GDP and Happiness Score in these
+        visualizations.</text>
     </p>
     <p style="text-align: start; width:70%; margin-left: 25%; margin-right: 25%;">
       <b>What is an MBTI ?</b>
@@ -92,7 +93,7 @@
       This data visualization explores MBTI distributions for each country based on their happiness scores.
     </p>
     <text style="color:red; line-height: 1; font-size: 18px;">
-      Hover over countries to view Happiness index and MBTI distribution. <br /> 
+      Hover over countries to view Happiness index and MBTI distribution. <br />
       Zoom in or Click on a country to zoom to view its specific location. <br /></text>
 
     <div id='map-cover' style='display: flex; flex-direction: column;'>
@@ -104,10 +105,10 @@
 
     </div>
 
-    <br/>
-    <br/>
-    <br/>
-    <br/>
+    <br />
+    <br />
+    <br />
+    <br />
 
     <p style="font-size:30px; line-height: 1.6;">
       GDP Distribution of Countries by MBTI Personality Type
@@ -137,7 +138,7 @@
       const svg1 = d3.select("#choropleth");
       const width1 = svg1.attr("width");
       const height1 = svg1.attr("height");
-      const margin1 = { top: 0, right: 5, bottom:0, left: 5 };
+      const margin1 = { top: 0, right: 5, bottom: 0, left: 5 };
       const mapWidth1 = width1 - margin1.left - margin1.right;
       const mapHeight1 = height1 - margin1.top - margin1.bottom;
       const chartArea1 = svg1.append("g")
@@ -307,7 +308,7 @@
 
         let tooltip_rect = tooltip.append("rect")
           .attr('class', 'info-viz1')
-          .attr("visibility", "hidden")
+          .attr("visibility", "visible")
           .attr("x", 0)
           .attr("y", 0)
           .attr('opacity', 0.8)
@@ -454,8 +455,8 @@
 
           let state = d3.select(this);
           state.attr("stroke", "darkgreen")
-               .style("opacity","0.7")
-               .attr("stroke-width", 1.5);
+            .style("opacity", "0.7")
+            .attr("stroke-width", 1.5);
 
           var mo = topojson.mesh(world, world.objects.countries, function (a, b) { return a.id === ".country" || b.id === ".country"; });
           momesh.datum(mo).attr("d", path)
@@ -465,12 +466,12 @@
 
         function mouseOutPlot() {
           tooltip.attr("visibility", "hidden");
-          tooltip_rect.attr("visibility", "hidden");
+          // tooltip_rect.attr("visibility", "hidden");
           textbox1.style("visibility", "hidden");
           country_info_bars_svg.style('visibility', 'hidden');
 
           let state = d3.select(this);
-          state.style("opacity","1").attr("stroke", "black").attr("stroke-width", 0.2);
+          state.style("opacity", "1").attr("stroke", "black").attr("stroke-width", 0.2);
           momesh.attr("d", "");
 
         }
